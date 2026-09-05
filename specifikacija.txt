@@ -1,0 +1,195 @@
+🎭 Tajna Mafija - Specifikacija 
+
+Verzija: za aplikaciju koja vodi igru uživo 
+
+ 
+
+ULOGE 
+
+🟥 MAFIJA TIM (zli) 
+
+Ove uloge igraju protiv civila.  
+
+1. Mafijaš 
+
+Običan član mafije. Svake noći učestvuje u glasanju koga ubiti. 
+
+2. Don (Šef mafije) 
+
+Ima poslednju reč kod izbora mete za ubistvo. Ako se ostali ne slože, njegov glas presuđuje. 
+
+3. Tihooki 
+
+Ne može glasati tokom dana. Zna ko su mafijaši, ali ostaje tih. 
+
+4. Lažni lekar 
+
+Ima ulogu lekara, ali zapravo otrovava mete. Ako "leči" civila – on umire. 
+
+5. Advokat 
+
+Jednom u toku igre može zaštititi člana mafije od izbacivanja. 
+
+ 
+
+🟦 CIVILI (dobri) 
+
+Cilj im je pronaći i eliminisati sve mafijaše. 
+
+6. Civil 
+
+Običan igrač bez posebnih moći. Glasa tokom dana. 
+
+7. Policajac 
+
+Svake noći proverava jednog igrača – saznaje da li je mafijaš. 
+
+8. Lekar 
+
+Može zaštititi jednog igrača po noći od ubistva. 
+
+9. Lovac 
+
+Ako bude ubijen ili izbačen – može sa sobom povesti jednog igrača u smrt. 
+
+10. Vidovnjak 
+
+Može svake noći proveriti tačnu ulogu jednog igrača. 
+
+11. Telohranitelj 
+
+Zaštiti jednog igrača po noći. Ako taj igrač bude meta – telohranitelj umire umesto njega. 
+
+ 
+
+🟨 NEUTRALNE ULOGE (igraju za sebe) 
+
+13. Džoker 
+
+Pobeđuje samo ako bude izbačen tokom dana. 
+
+14. Ubica (solo) 
+
+Igra sam. Svake druge noći ubija jednog igrača. Pobeđuje ako ostane poslednji. 
+
+ 
+
+🌀 Zabavne / haotične uloge 
+
+15. Prevarant 
+
+Jednom u igri može ukrasti ulogu drugog igrača. 
+
+16. Ludak 
+
+Misli da je civil, ali zapravo pomaže mafiji. Ne zna za svoju pravu ulogu. 
+
+17. Pijani 
+
+Prve dve noći ne zna koja je uloga. Treće noći se “otrizni” i sazna. 
+
+18. Blizanac 
+
+Postoje dva blizanca. Ako jedan umre, drugi umire sa njim. 
+
+19. Menjač 
+
+Može jednom u toku igre zameniti uloge dva igrača. 
+
+20. Špijun 
+
+Može jedne noći "prisluškivati" mafiju ili civila i saznati s kim sarađuje. 
+
+OPCIJE ZA POCETAK IGRE 
+
+ Izbor uloga 
+
+Za svaku dostupnu ulogu host bira: 
+
+✅ Da li se uloga koristi (uključeno/isključeno) 
+
+🔢 Broj instanci te uloge (npr. 1 Lekar, 2 Mafijaša) 
+
+🎲 Šansa da se uloga pojavi – ako je slučajno dodavanje (npr. 60%) 
+
+Uloge se nasumično dodeljuju igračima, po ovim parametrima. 
+
+Provera balansa uloga 
+
+Aplikacija automatski proverava: 
+
+Da li broj civila > broj mafije 
+
+Neutralne uloge ne utiču na ovu proveru 
+
+Ako uslov nije ispunjen: 
+
+⚠️ Prikazuje se upozorenje: 
+"Odnos dobrih i zlih nije dozvoljen. Dodaj još civila ili smanji broj mafije." 
+
+Takođe, prikazuje se preporučeni odnos: 
+
+✅ Preporuka: Dobrih treba da bude bar 1.5x više od zlih 
+
+Tajmer po igraču (za noćne poteze) 
+
+Svi igrači dobijaju isti vremenski interval za noćni potez (npr. 15 sekundi), bez obzira na to da li imaju akciju ili ne. 
+
+Cilj: da se ne otkrije ko ima aktivnu ulogu 
+
+Način otkrivanja uloga nakon smrti 
+
+Prikazati ulogu – igrači saznaju ko je umro i koja mu je bila uloga 
+
+Sakriti ulogu – samo se vidi da je igrač eliminisan (hardcore mod) 
+
+Vreme trajanja dana – koliko dugo igrači mogu da diskutuju 
+
+Anonimno glasanje – na telefonima glasanje 
+
+Sudija mode – svi igrači vide uloge osim jednog igrača (za učenje i tutorijal) 
+
+ 
+
+TOK IGRE 
+
+Može jedne noći "prisluškivati" mafiju ili civila i saznati s kim sarađuje. 
+
+ 
+
+BODOVNI SISTEM 
+
+Može jedne noći "prisluškivati" mafiju ili civila i saznati s kim sarađuje. 
+
+ 
+
+
+DIZAJN 
+
+Može jedne noći "prisluškivati" mafiju ili civila i saznati s kim sarađuje. 
+
+ 
+
+GENERALNE OPCIJE 
+
+Glas vodic tokom igre ukljucen ili iskljucen. 
+
+Zvuk 
+
+Nalog * 
+
+ 
+
+SAVET KAKO IGRATI 
+
+Može jedne noći "prisluškivati" mafiju ili civila i saznati s kim sarađuje. 
+
+ 
+
+PRAVILA 
+
+Može jedne noći "prisluškivati" mafiju ili civila i saznati s kim sarađuje. 
+
+ 
+
+ 
