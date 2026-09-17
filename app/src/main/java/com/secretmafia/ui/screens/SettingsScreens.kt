@@ -2,7 +2,6 @@ package com.secretmafia.ui.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import com.secretmafia.game.AppLang
 import com.secretmafia.game.AppSettings
 import com.secretmafia.game.DayVoteMode
 import com.secretmafia.game.DummyActionType
@@ -28,11 +27,6 @@ fun SettingsHub(
         VSpace(12.dp)
         PixelButton(s.gameplay, onClick = onGameplay)
         VSpace(24.dp)
-        PixelText(s.comingSoon, size = 14)
-        VSpace(8.dp)
-        SettingRow(s.narrator, s.off) { }
-        PixelText(s.narratorSoon, size = 13)
-        VSpace(24.dp)
         PixelButton(s.back, onClick = onBack)
     }
 }
@@ -50,12 +44,8 @@ fun AppearanceScreen(
         SettingRow(s.lightTheme, onOff(s, settings.lightTheme)) {
             onChange(settings.copy(lightTheme = !settings.lightTheme))
         }
-        SettingRow(s.language, if (settings.language == AppLang.SR) "SRPSKI" else "ENGLISH") {
-            onChange(
-                settings.copy(
-                    language = if (settings.language == AppLang.EN) AppLang.SR else AppLang.EN,
-                ),
-            )
+        SettingRow(s.language, settings.language.nativeName) {
+            onChange(settings.copy(language = settings.language.next()))
         }
         SettingRow(s.hideColors, onOff(s, settings.hideGameColors)) {
             onChange(settings.copy(hideGameColors = !settings.hideGameColors))
@@ -64,6 +54,12 @@ fun AppearanceScreen(
         VSpace()
         SettingRow(s.sound, onOff(s, settings.soundEnabled)) {
             onChange(settings.copy(soundEnabled = !settings.soundEnabled))
+        }
+        SettingRow(s.vibration, onOff(s, settings.vibrationEnabled)) {
+            onChange(settings.copy(vibrationEnabled = !settings.vibrationEnabled))
+        }
+        SettingRow(s.narrator, onOff(s, settings.narratorEnabled)) {
+            onChange(settings.copy(narratorEnabled = !settings.narratorEnabled))
         }
         VSpace()
         PixelButton(s.back, onClick = onBack)
@@ -121,6 +117,16 @@ fun GameplayNightScreen(
         VSpace()
         SettingRow(s.firstKill, onOff(s, settings.firstNightKill)) {
             onChange(settings.copy(firstNightKill = !settings.firstNightKill))
+        }
+        SettingRow(s.mafiaConfer, onOff(s, settings.mafiaConfer)) {
+            onChange(settings.copy(mafiaConfer = !settings.mafiaConfer))
+        }
+        PixelText(s.mafiaConferHint, size = 13)
+        if (settings.mafiaConfer) {
+            VSpace(8.dp)
+            SettingRow(s.mafiaTalkTime, s.secLabel(settings.mafiaConferSeconds)) {
+                onChange(settings.copy(mafiaConferSeconds = nextConferSecs(settings.mafiaConferSeconds)))
+            }
         }
         SettingRow(s.voteCount, onOff(s, settings.showMafiaVoteCount)) {
             onChange(settings.copy(showMafiaVoteCount = !settings.showMafiaVoteCount))
@@ -188,4 +194,13 @@ private fun nextDummy(current: DummyActionType): DummyActionType = when (current
     DummyActionType.LIKE -> DummyActionType.MATH
     DummyActionType.MATH -> DummyActionType.RANDOM
     DummyActionType.RANDOM -> DummyActionType.LIKE
+}
+
+private fun nextConferSecs(current: Int): Int = when (current) {
+    8 -> 12
+    12 -> 16
+    16 -> 20
+    20 -> 24
+    24 -> 30
+    else -> 8
 }

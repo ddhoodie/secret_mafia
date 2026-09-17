@@ -46,6 +46,7 @@ fun ProvideAppStyle(
     CompositionLocalProvider(
         LocalPalette provides buildPalette(settings.lightTheme, settings.hideGameColors, inGame),
         LocalStr provides Str(settings.language),
+        LocalFont provides uiFont(settings.language),
         LocalInGame provides inGame,
         content = content,
     )

@@ -1,11 +1,14 @@
 package com.secretmafia.ui.screens
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.secretmafia.game.Role
 import com.secretmafia.ui.components.PixelButton
 import com.secretmafia.ui.components.PixelScreen
 import com.secretmafia.ui.components.PixelText
+import com.secretmafia.ui.components.RoleHelpButton
+import com.secretmafia.ui.components.RolePortrait
 import com.secretmafia.ui.components.VSpace
 import com.secretmafia.ui.theme.str
 
@@ -61,7 +64,7 @@ fun RulesRolesList(
         VSpace(10.dp)
         listOf(
             Role.CIVILIAN, Role.HEALER, Role.COP,
-            Role.HUNTER, Role.SEER, Role.BODYGUARD, Role.TWIN_CIVIL,
+            Role.HUNTER, Role.SEER, Role.BODYGUARD, Role.MAYOR, Role.NECROMANCER, Role.VIGILANTE, Role.TWIN_CIVIL,
         ).forEach {
             PixelButton(s.roleTitle(it)) { onRole(it) }
             VSpace(8.dp)
@@ -70,7 +73,7 @@ fun RulesRolesList(
         PixelText(s.evilRoles, size = 16, bold = true)
         VSpace(10.dp)
         listOf(
-            Role.MAFIA, Role.DON, Role.LAWYER,
+            Role.MAFIA, Role.DON, Role.LAWYER, Role.FRAMER, Role.TRAITOR, Role.POISONER,
             Role.LUNATIC, Role.TWIN_MAFIA,
         ).forEach {
             PixelButton(s.roleTitle(it)) { onRole(it) }
@@ -79,7 +82,9 @@ fun RulesRolesList(
         VSpace(18.dp)
         PixelText(s.wildRoles, size = 16, bold = true)
         VSpace(10.dp)
-        listOf(Role.JOKER, Role.KILLER, Role.DRUNK).forEach {
+        listOf(
+            Role.JOKER, Role.KILLER, Role.DRUNK, Role.WHORE, Role.CURSED, Role.SURVIVOR, Role.AMNESIAC,
+        ).forEach {
             PixelButton(s.roleTitle(it)) { onRole(it) }
             VSpace(8.dp)
         }
@@ -92,9 +97,13 @@ fun RulesRolesList(
 fun RulesRoleDetail(role: Role, onBack: () -> Unit) {
     val s = str()
     PixelScreen(scroll = true) {
+        RolePortrait(role, size = 140.dp)
+        VSpace(16.dp)
         PixelText(s.roleTitle(role), size = 28, bold = true)
         VSpace(20.dp)
-        PixelText(s.roleBlurb(role), size = 16)
+        PixelText(s.roleBlurb(role), size = 16, align = TextAlign.Start)
+        VSpace(12.dp)
+        RoleHelpButton(role)
         VSpace(28.dp)
         PixelButton(s.back, onClick = onBack)
     }

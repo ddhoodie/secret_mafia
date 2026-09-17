@@ -9,20 +9,20 @@ import android.os.Vibrator
 import android.os.VibratorManager
 
 object Feedback {
-    fun tick(context: Context) {
-        vibrate(context, 30)
+    fun tick(context: Context, vibrate: Boolean = true) {
+        if (vibrate) pulse(context, 30)
     }
 
-    fun unlock(context: Context) {
-        vibrate(context, 60)
+    fun unlock(context: Context, vibrate: Boolean = true) {
+        if (vibrate) pulse(context, 60)
     }
 
-    fun death(context: Context) {
-        vibrate(context, 180)
+    fun death(context: Context, vibrate: Boolean = true) {
+        if (vibrate) pulse(context, 180)
     }
 
-    fun alarm(context: Context, sound: Boolean) {
-        vibrate(context, 400)
+    fun alarm(context: Context, sound: Boolean, vibrate: Boolean) {
+        if (vibrate) pulse(context, 400)
         if (sound) {
             runCatching {
                 val tone = ToneGenerator(AudioManager.STREAM_ALARM, 80)
@@ -31,7 +31,7 @@ object Feedback {
         }
     }
 
-    private fun vibrate(context: Context, ms: Long) {
+    private fun pulse(context: Context, ms: Long) {
         val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val manager = context.getSystemService(VibratorManager::class.java)
             manager.defaultVibrator

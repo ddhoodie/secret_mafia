@@ -9,21 +9,41 @@ class GameViewModel : ViewModel() {
     private val _state = MutableStateFlow<GameState?>(null)
     val state: StateFlow<GameState?> = _state
 
-    fun start(names: List<String>, counts: RoleCounts, settings: AppSettings) {
-        val players = GameRules.assignRoles(names, counts)
+    fun start(
+        names: List<String>,
+        counts: RoleCounts,
+        settings: AppSettings,
+        chances: RoleChances = RoleChances(),
+    ) {
+        val players = GameRules.assignRoles(names, counts, chances).map { p ->
+            if (p.role == Role.WHORE && settings.whoreAlign != WhoreAlign.PICK) {
+                p.copy(align = settings.whoreAlign)
+            } else {
+                p
+            }
+        }
         val first = GameRules.livingInOrder(players, 0).first()
         _state.value = GameState(
             settings = settings,
             players = players,
             nightNumber = 1,
             startIndex = 0,
-            phase = GamePhase.Handoff(first.id, PassKind.NIGHT),
+            phase = nightOpenPhase(settings.mafiaConfer, first.id),
             dummyOverride = GameRules.dummyFor(settings),
+            startedAtMillis = System.currentTimeMillis(),
         )
     }
 
     fun clear() {
         _state.value = null
+    }
+
+    fun patchSettings(transform: (AppSettings) -> AppSettings) {
+        _state.update { it?.copy(settings = transform(it.settings)) }
+    }
+
+    fun markMatchPaid() {
+        _state.update { it?.copy(matchPaid = true) }
     }
 
     fun finishHandoff() {
@@ -40,6 +60,7 @@ class GameViewModel : ViewModel() {
                 phase = GamePhase.Action(phase.playerId, phase.kind),
                 lastAction = null,
                 lawyerPickingShield = false,
+                framerPicking = false,
                 dummyOverride = GameRules.dummyFor(s.settings),
             )
         }
@@ -53,7 +74,7 @@ class GameViewModel : ViewModel() {
             PassKind.DAY_VOTE -> _state.update {
                 it?.copy(
                     dayVotes = s.dayVotes + (actor.id to targetId),
-                    lastAction = NightActionResult(ActionAnimation.VOTE),
+                    lastAction = NightActionResult(ActionAnimation.VOTE, actorRole = actor.role),
                     phase = GamePhase.RevealWait(actor.id, PassKind.DAY_VOTE),
                 )
             }
@@ -62,17 +83,25 @@ class GameViewModel : ViewModel() {
                 finishHunter(s, players, extra)
             }
             PassKind.NIGHT -> when (actor.role) {
-                Role.MAFIA, Role.DON -> recordMafiaVote(s, actor, targetId, goShield = false)
-                Role.LAWYER -> recordMafiaVote(s, actor, targetId, goShield = !s.lawyerShieldUsed)
+                Role.MAFIA, Role.DON -> recordMafiaVote(s, actor, targetId, goShield = false, goFrame = false)
+                Role.LAWYER -> recordMafiaVote(s, actor, targetId, goShield = !s.lawyerShieldUsed, goFrame = false)
+                Role.FRAMER -> recordMafiaVote(s, actor, targetId, goShield = false, goFrame = true)
                 Role.HEALER -> reveal(s, actor, s.copy(healTargetId = targetId), ActionAnimation.HEAL)
                 Role.BODYGUARD -> reveal(s, actor, s.copy(bodyguardTargetId = targetId), ActionAnimation.GUARD)
                 Role.KILLER -> reveal(s, actor, s.copy(killerTargetId = targetId), ActionAnimation.KNIFE)
+                Role.VIGILANTE -> reveal(
+                    s, actor,
+                    s.copy(vigilanteTargetId = targetId, vigilanteUsed = true),
+                    ActionAnimation.KNIFE,
+                )
+                Role.POISONER -> reveal(s, actor, s.copy(poisonTargetId = targetId), ActionAnimation.POISON)
+                Role.WHORE -> reveal(s, actor, s.copy(whoreTargetId = targetId), ActionAnimation.SLEEP)
                 Role.COP -> {
                     val target = s.players.first { it.id == targetId }
                     reveal(
                         s, actor, s,
                         ActionAnimation.INSPECT,
-                        inspectGood = !GameRules.copSeesEvil(target),
+                        inspectGood = !GameRules.copSeesEvil(target, s.framedId),
                         inspectName = target.name,
                     )
                 }
@@ -85,10 +114,72 @@ class GameViewModel : ViewModel() {
                         inspectRole = target.role?.name,
                     )
                 }
+                Role.NECROMANCER -> {
+                    val target = s.players.first { it.id == targetId }
+                    reveal(
+                        s, actor, s,
+                        ActionAnimation.SEER,
+                        inspectName = target.name,
+                        inspectRole = target.role?.name,
+                    )
+                }
+                Role.AMNESIAC -> {
+                    val target = s.players.first { it.id == targetId }
+                    val taken = target.role
+                    if (!GameRules.amnesiacCanTake(taken)) return
+                    val players = s.players.map { p ->
+                        if (p.id == actor.id) p.copy(role = taken, twinId = null) else p
+                    }
+                    reveal(
+                        s, actor, s.copy(players = players),
+                        ActionAnimation.RISE,
+                        inspectName = target.name,
+                        inspectRole = taken?.name,
+                    )
+                }
                 else -> { }
             }
         }
     }
+
+    fun submitWhoreAlign(align: WhoreAlign) {
+        val s = _state.value ?: return
+        val phase = s.phase as? GamePhase.Action ?: return
+        if (align == WhoreAlign.PICK) return
+        _state.update {
+            it?.copy(
+                players = s.players.map { p ->
+                    if (p.id == phase.playerId) p.copy(align = align) else p
+                },
+            )
+        }
+    }
+
+    fun submitMayorReveal() {
+        val s = _state.value ?: return
+        val phase = s.phase as? GamePhase.Action ?: return
+        val actor = s.players.first { it.id == phase.playerId }
+        reveal(s, actor, s.copy(mayorRevealed = true), ActionAnimation.REVEAL)
+    }
+
+    fun submitFrame(targetId: String?) {
+        val s = _state.value ?: return
+        val phase = s.phase as? GamePhase.Action ?: return
+        val actor = s.players.first { it.id == phase.playerId }
+        _state.update {
+            it?.copy(
+                framedId = targetId,
+                framerPicking = false,
+                lastAction = NightActionResult(
+                    animation = if (targetId != null) ActionAnimation.FRAME else ActionAnimation.KNIFE,
+                    actorRole = actor.role,
+                ),
+                phase = GamePhase.RevealWait(actor.id, PassKind.NIGHT),
+            )
+        }
+    }
+
+    fun submitSkipNight() = dummy(ActionAnimation.LIKE)
 
     fun submitLawyerShield(targetId: String?) {
         val s = _state.value ?: return
@@ -99,7 +190,10 @@ class GameViewModel : ViewModel() {
                 lawyerShieldTargetId = targetId,
                 lawyerShieldUsed = targetId != null || s.lawyerShieldUsed,
                 lawyerPickingShield = false,
-                lastAction = NightActionResult(if (targetId != null) ActionAnimation.SHIELD else ActionAnimation.KNIFE),
+                lastAction = NightActionResult(
+                    animation = if (targetId != null) ActionAnimation.SHIELD else ActionAnimation.KNIFE,
+                    actorRole = actor.role,
+                ),
                 phase = GamePhase.RevealWait(actor.id, PassKind.NIGHT),
             )
         }
@@ -111,22 +205,37 @@ class GameViewModel : ViewModel() {
     private fun dummy(anim: ActionAnimation) {
         val s = _state.value ?: return
         val phase = s.phase as? GamePhase.Action ?: return
+        val actor = s.players.first { it.id == phase.playerId }
         _state.update {
             it?.copy(
-                lastAction = NightActionResult(anim),
+                lastAction = NightActionResult(anim, actorRole = actor.role),
                 phase = GamePhase.RevealWait(phase.playerId, phase.kind),
             )
         }
     }
 
-    private fun recordMafiaVote(s: GameState, actor: Player, targetId: String, goShield: Boolean) {
+    private fun recordMafiaVote(
+        s: GameState,
+        actor: Player,
+        targetId: String,
+        goShield: Boolean,
+        goFrame: Boolean,
+    ) {
         val next = s.copy(mafiaVotes = s.mafiaVotes + (actor.id to targetId))
-        if (goShield) {
-            _state.update {
-                next.copy(lawyerPickingShield = true, lastAction = NightActionResult(ActionAnimation.KNIFE))
+        when {
+            goShield -> _state.update {
+                next.copy(
+                    lawyerPickingShield = true,
+                    lastAction = NightActionResult(ActionAnimation.KNIFE, actorRole = actor.role),
+                )
             }
-        } else {
-            reveal(s, actor, next, ActionAnimation.KNIFE)
+            goFrame -> _state.update {
+                next.copy(
+                    framerPicking = true,
+                    lastAction = NightActionResult(ActionAnimation.KNIFE, actorRole = actor.role),
+                )
+            }
+            else -> reveal(s, actor, next, ActionAnimation.KNIFE)
         }
     }
 
@@ -141,7 +250,13 @@ class GameViewModel : ViewModel() {
     ) {
         _state.update {
             next.copy(
-                lastAction = NightActionResult(anim, inspectGood, inspectName, inspectRole),
+                lastAction = NightActionResult(
+                    animation = anim,
+                    inspectGood = inspectGood,
+                    inspectName = inspectName,
+                    inspectRoleTitle = inspectRole,
+                    actorRole = actor.role,
+                ),
                 phase = GamePhase.RevealWait(actor.id, PassKind.NIGHT),
             )
         }
@@ -167,25 +282,43 @@ class GameViewModel : ViewModel() {
 
     private fun resolveNight() {
         val s = _state.value ?: return
-        val hits = GameRules.planNightHits(
+        val blocked = GameRules.nightAfterBlock(
             players = s.players,
+            blockedId = s.whoreTargetId,
             mafiaVotes = s.mafiaVotes,
             healTargetId = s.healTargetId,
             bodyguardTargetId = s.bodyguardTargetId,
             killerTargetId = s.killerTargetId,
+            vigilanteTargetId = s.vigilanteTargetId,
+            poisonTargetId = s.poisonTargetId,
+            framedId = s.framedId,
+        )
+        val hits = GameRules.planNightHits(
+            players = s.players,
+            mafiaVotes = blocked.mafiaVotes,
+            healTargetId = blocked.healTargetId,
+            bodyguardTargetId = blocked.bodyguardTargetId,
+            killerTargetId = blocked.killerTargetId,
             nightNumber = s.nightNumber,
             firstNightKill = s.settings.firstNightKill,
+            vigilanteTargetId = blocked.vigilanteTargetId,
+            poisonDueId = s.poisonDueId,
         )
-        val (players, deaths) = GameRules.applyNightDeaths(s.players, hits, s.bodyguardTargetId)
+        val (players, deaths) = GameRules.applyNightDeaths(s.players, hits, blocked.bodyguardTargetId)
         val hunter = GameRules.firstDeadHunter(s.players, players)
         val cleared = s.copy(
             players = players,
             lastNightDeaths = deaths,
-            lastHealTargetId = s.healTargetId,
-            lastBodyguardTargetId = s.bodyguardTargetId,
+            lastHealTargetId = blocked.healTargetId,
+            lastBodyguardTargetId = blocked.bodyguardTargetId,
+            lastWhoreTargetId = s.whoreTargetId ?: s.lastWhoreTargetId,
             healTargetId = null,
             bodyguardTargetId = null,
             killerTargetId = null,
+            whoreTargetId = null,
+            framedId = blocked.framedId,
+            vigilanteTargetId = null,
+            poisonTargetId = blocked.poisonTargetId,
             mafiaVotes = emptyMap(),
             lastAction = null,
         )
@@ -202,10 +335,8 @@ class GameViewModel : ViewModel() {
 
     private fun finishAfterNight(s: GameState, players: List<Player>) {
         val winner = GameRules.winner(players)
-        _state.value = s.copy(
-            players = players,
-            phase = if (winner != null) GamePhase.GameOver(winner) else GamePhase.NightSummary,
-        )
+        val next = s.copy(players = players)
+        _state.value = if (winner != null) next.endWith(winner) else next.copy(phase = GamePhase.NightSummary)
     }
 
     private fun finishHunter(s: GameState, players: List<Player>, extra: List<DeathRecord>) {
@@ -213,19 +344,19 @@ class GameViewModel : ViewModel() {
         val nightDeaths = if (resume == HunterResume.NIGHT) s.lastNightDeaths + extra else s.lastNightDeaths
         val dayDeaths = if (resume == HunterResume.DAY) s.lastDayDeaths + extra else s.lastDayDeaths
         val winner = GameRules.winner(players)
-        _state.value = s.copy(
+        val next = s.copy(
             players = players,
             lastNightDeaths = nightDeaths,
             lastDayDeaths = dayDeaths,
             pendingHunterId = null,
             hunterResume = null,
-            lastAction = NightActionResult(ActionAnimation.HUNT),
-            phase = when {
-                winner != null -> GamePhase.GameOver(winner)
-                resume == HunterResume.NIGHT -> GamePhase.NightSummary
-                else -> GamePhase.DaySummary
-            },
+            lastAction = NightActionResult(ActionAnimation.HUNT, actorRole = Role.HUNTER),
         )
+        _state.value = when {
+            winner != null -> next.endWith(winner)
+            resume == HunterResume.NIGHT -> next.copy(phase = GamePhase.NightSummary)
+            else -> next.copy(phase = GamePhase.DaySummary)
+        }
     }
 
     fun continueFromNightSummary() {
@@ -256,7 +387,7 @@ class GameViewModel : ViewModel() {
 
     private fun resolvePhoneDay() {
         val s = _state.value ?: return
-        applyDayDeath(s, GameRules.resolveDayPhoneVote(s.dayVotes))
+        applyDayDeath(s, GameRules.resolveDayPhoneVote(s.dayVotes, s.mayorRevealedId()))
     }
 
     private fun applyDayDeath(s: GameState, victimId: String?) {
@@ -267,8 +398,7 @@ class GameViewModel : ViewModel() {
                 lastDayDeaths = deaths,
                 dayVotes = emptyMap(),
                 lastAction = null,
-                phase = GamePhase.GameOver(Winner.JOKER),
-            )
+            ).endWith(Winner.JOKER)
             return
         }
         val (players, deaths) = GameRules.applyDayExile(s.players, victimId, s.lawyerShieldTargetId)
@@ -290,9 +420,16 @@ class GameViewModel : ViewModel() {
             return
         }
         val winner = GameRules.winner(players)
-        _state.value = cleared.copy(
-            phase = if (winner != null) GamePhase.GameOver(winner) else GamePhase.DaySummary,
-        )
+        _state.value = if (winner != null) cleared.endWith(winner) else cleared.copy(phase = GamePhase.DaySummary)
+    }
+
+    private fun GameState.mayorRevealedId(): String? =
+        if (!mayorRevealed) null else players.firstOrNull { it.alive && it.role == Role.MAYOR }?.id
+
+    private fun GameState.endWith(winner: Winner): GameState {
+        val reward = matchReward ?: Progress.evaluateMatch(System.currentTimeMillis() - startedAtMillis, winner)
+        val lived = players.any { it.alive && it.role == Role.SURVIVOR }
+        return copy(phase = GamePhase.GameOver(winner), matchReward = reward, survivorLived = lived)
     }
 
     fun continueFromDaySummary() {
@@ -307,13 +444,27 @@ class GameViewModel : ViewModel() {
                 healTargetId = null,
                 bodyguardTargetId = null,
                 killerTargetId = null,
+                whoreTargetId = null,
+                poisonDueId = s.poisonTargetId,
+                poisonTargetId = null,
+                framedId = null,
                 dayVotes = emptyMap(),
                 lastAction = null,
                 dummyOverride = GameRules.dummyFor(s.settings),
-                phase = GamePhase.Handoff(first.id, PassKind.NIGHT),
+                phase = nightOpenPhase(s.settings.mafiaConfer, first.id),
             )
         }
     }
+
+    fun finishMafiaConfer() {
+        val s = _state.value ?: return
+        if (s.phase !is GamePhase.MafiaConfer) return
+        val first = GameRules.livingInOrder(s.players, s.startIndex).firstOrNull() ?: return
+        _state.update { it?.copy(phase = GamePhase.Handoff(first.id, PassKind.NIGHT)) }
+    }
+
+    private fun nightOpenPhase(confer: Boolean, firstId: String): GamePhase =
+        if (confer) GamePhase.MafiaConfer else GamePhase.Handoff(firstId, PassKind.NIGHT)
 
     fun livingMafiaBesides(playerId: String): List<Player> {
         val s = _state.value ?: return emptyList()
@@ -345,6 +496,10 @@ class GameViewModel : ViewModel() {
         val living = s.players.filter { it.alive }
         return when (actor.role) {
             Role.COP, Role.SEER -> living.filter { it.id != actor.id }
+            Role.NECROMANCER -> GameRules.deadPlayers(s.players)
+            Role.AMNESIAC -> GameRules.deadTakeable(s.players)
+            Role.VIGILANTE, Role.POISONER, Role.KILLER -> living.filter { it.id != actor.id }
+            Role.WHORE -> GameRules.whoreTargets(living, actor.id, s.lastWhoreTargetId)
             Role.HEALER -> {
                 if (s.settings.healerMayRepeatTarget || s.lastHealTargetId == null) living
                 else living.filter { it.id != s.lastHealTargetId }
@@ -367,11 +522,18 @@ class GameViewModel : ViewModel() {
 
     fun usesDummy(actor: Player): Boolean {
         val s = _state.value ?: return true
+        if (s.whoreTargetId == actor.id) return true
         return when (actor.role) {
-            Role.MAFIA, Role.DON, Role.LAWYER, Role.HEALER, Role.COP, Role.SEER, Role.BODYGUARD -> false
+            Role.WHORE -> nightTargets(actor).isEmpty()
+            Role.MAFIA, Role.DON, Role.LAWYER, Role.FRAMER,
+            Role.HEALER, Role.COP, Role.SEER, Role.BODYGUARD, Role.POISONER, Role.TWIN_MAFIA -> false
             Role.KILLER -> !GameRules.killerActsTonight(s.nightNumber)
-            Role.HUNTER, Role.JOKER, Role.CIVILIAN, Role.LUNATIC, Role.DRUNK, Role.TWIN_CIVIL, null -> true
-            Role.TWIN_MAFIA -> false
+            Role.MAYOR -> s.mayorRevealed
+            Role.NECROMANCER -> GameRules.deadPlayers(s.players).isEmpty()
+            Role.VIGILANTE -> s.vigilanteUsed
+            Role.AMNESIAC -> GameRules.deadTakeable(s.players).isEmpty()
+            Role.HUNTER, Role.JOKER, Role.CIVILIAN, Role.LUNATIC, Role.DRUNK, Role.TWIN_CIVIL,
+            Role.TRAITOR, Role.CURSED, Role.SURVIVOR, null -> true
         }
     }
 }
