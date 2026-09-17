@@ -26,34 +26,85 @@ object GameRules {
         return RoleCounts(mafia, 1, 1, (playerCount - mafia - 2).coerceAtLeast(0))
     }
 
-    fun assignRoles(names: List<String>, counts: RoleCounts): List<Player> {
+    fun assignRoles(
+        names: List<String>,
+        counts: RoleCounts,
+        chances: RoleChances = RoleChances(),
+        rng: kotlin.random.Random = kotlin.random.Random.Default,
+    ): List<Player> {
         require(names.size == counts.total) {
             "Role total ${counts.total} must match ${names.size} players"
         }
-        require(isTwinCountOk(counts[Role.TWIN_CIVIL])) { "Civilian twins must be 0 or 2" }
-        require(isTwinCountOk(counts[Role.TWIN_MAFIA])) { "Mafia twins must be 0 or 2" }
+        require(isTwinCountOk(counts[Role.TWIN_CIVIL])) { "Civilian twins must be even" }
+        require(isTwinCountOk(counts[Role.TWIN_MAFIA])) { "Mafia twins must be even" }
         val bag = buildList {
-            Role.entries.forEach { role -> repeat(counts[role]) { add(role) } }
-        }.shuffled()
-        return names.mapIndexed { index, name ->
+            Role.entries.forEach { role ->
+                val n = counts[role]
+                if (n <= 0) return@forEach
+                when {
+                    role.core -> repeat(n) { add(role) }
+                    role == Role.TWIN_CIVIL || role == Role.TWIN_MAFIA -> {
+                        repeat(n / 2) {
+                            val keep = rng.nextInt(100) < chances[role]
+                            val pick = if (keep) role else fallbackRole(role)
+                            add(pick)
+                            add(pick)
+                        }
+                    }
+                    else -> repeat(n) {
+                        add(if (rng.nextInt(100) < chances[role]) role else fallbackRole(role))
+                    }
+                }
+            }
+        }.shuffled(rng)
+        val assigned = names.mapIndexed { index, name ->
             val role = bag[index]
             Player(
                 name = name.trim(),
                 role = role,
-                twinId = when (role) {
-                    Role.TWIN_CIVIL -> "twin-civil"
-                    Role.TWIN_MAFIA -> "twin-mafia"
-                    else -> null
+                femaleArt = when (role) {
+                    Role.CIVILIAN, Role.LUNATIC -> rng.nextBoolean()
+                    Role.WHORE -> true
+                    else -> false
                 },
             )
         }
+        return pairTwins(assigned)
     }
 
-    fun isTwinCountOk(n: Int) = n == 0 || n == 2
+    private fun pairTwins(players: List<Player>): List<Player> {
+        val ids = mutableMapOf<String, String>()
+        fun pairRole(role: Role, prefix: String) {
+            players.filter { it.role == role }.chunked(2).forEachIndexed { i, pair ->
+                if (pair.size < 2) return@forEachIndexed
+                val tid = "$prefix-$i"
+                pair.forEach { ids[it.id] = tid }
+            }
+        }
+        pairRole(Role.TWIN_CIVIL, "twin-civil")
+        pairRole(Role.TWIN_MAFIA, "twin-mafia")
+        if (ids.isEmpty()) return players
+        return players.map { p -> ids[p.id]?.let { p.copy(twinId = it) } ?: p }
+    }
 
-    /** Only good vs evil. Wild / neutrals are the host's call. */
-    fun tooManyEvil(counts: RoleCounts): Boolean =
-        counts.evil > 0 && counts.good < counts.evil * 1.5
+    fun fallbackRole(role: Role): Role = when (role.team) {
+        Team.EVIL -> Role.MAFIA
+        Team.GOOD, Team.NEUTRAL -> Role.CIVILIAN
+    }
+
+    fun isTwinCountOk(n: Int) = n >= 0 && n % 2 == 0
+
+    /** Need strictly more non-evil than evil (neutrals count as non-evil). */
+    fun tooManyEvil(counts: RoleCounts): Boolean {
+        if (counts.total <= 0) return false
+        val nonEvil = counts.total - counts.evil
+        return counts.evil > 0 && nonEvil <= counts.evil
+    }
+
+    fun recommendedTeamSplit(playerCount: Int): Pair<Int, Int> {
+        val rec = recommendedCounts(playerCount)
+        return rec.evil to rec.good
+    }
 
     fun maxEvilFor(playerCount: Int): Int {
         val rec = recommendedCounts(playerCount)
@@ -80,11 +131,13 @@ object GameRules {
 
     fun winner(players: List<Player>): Winner? {
         val living = players.filter { it.alive }
+        if (living.any { it.soloWhore } && living.size <= 2) return Winner.WHORE
         if (living.size == 1 && living.first().role == Role.KILLER) return Winner.KILLER
-        val evil = living.count { it.role?.team == Team.EVIL }
-        val good = living.count { it.role?.team == Team.GOOD }
+        val evil = living.count { it.side == Team.EVIL }
+        val good = living.count { it.side == Team.GOOD }
         val killerAlive = living.any { it.role == Role.KILLER }
-        if (evil == 0 && !killerAlive) return Winner.GOOD
+        val soloAlive = living.any { it.soloWhore }
+        if (evil == 0 && !killerAlive && !soloAlive) return Winner.GOOD
         if (evil > 0 && evil >= good) return Winner.MAFIA
         return null
     }
@@ -106,6 +159,8 @@ object GameRules {
     data class NightHits(
         val mafiaVictimId: String?,
         val killerVictimId: String?,
+        val vigVictimId: String? = null,
+        val poisonVictimId: String? = null,
     )
 
     fun planNightHits(
@@ -116,17 +171,23 @@ object GameRules {
         killerTargetId: String?,
         nightNumber: Int,
         firstNightKill: Boolean,
+        vigilanteTargetId: String? = null,
+        poisonDueId: String? = null,
     ): NightHits {
         val rawMafia = if (nightNumber == 1 && !firstNightKill) {
             null
         } else {
             pickMafiaVictim(players, mafiaVotes)
         }
-        val mafiaAfterHeal = if (rawMafia != null && rawMafia == healTargetId) null else rawMafia
+        fun afterHeal(id: String?) = if (id != null && id == healTargetId) null else id
         val killerActive = nightNumber % 2 == 0
         val rawKiller = if (killerActive) killerTargetId else null
-        val killerAfterHeal = if (rawKiller != null && rawKiller == healTargetId) null else rawKiller
-        return NightHits(mafiaAfterHeal, killerAfterHeal)
+        return NightHits(
+            mafiaVictimId = afterHeal(rawMafia),
+            killerVictimId = afterHeal(rawKiller),
+            vigVictimId = afterHeal(vigilanteTargetId),
+            poisonVictimId = afterHeal(poisonDueId),
+        )
     }
 
     fun applyNightDeaths(
@@ -136,11 +197,15 @@ object GameRules {
     ): Pair<List<Player>, List<DeathRecord>> {
         val deaths = linkedMapOf<String, DeathCause>()
         fun mark(id: String?, cause: DeathCause) {
-            if (id != null) deaths.putIfAbsent(id, cause)
+            if (id != null && players.any { it.id == id && it.alive }) deaths.putIfAbsent(id, cause)
         }
 
         if (hits.mafiaVictimId != null) {
-            if (bodyguardTargetId != null && bodyguardTargetId == hits.mafiaVictimId) {
+            val cursed = players.firstOrNull { it.id == hits.mafiaVictimId && it.alive && it.role == Role.CURSED }
+            val guarded = bodyguardTargetId != null && bodyguardTargetId == hits.mafiaVictimId
+            if (cursed != null && !guarded) {
+                // convert later via players map
+            } else if (guarded) {
                 val guard = players.firstOrNull { it.role == Role.BODYGUARD && it.alive }
                 if (guard != null && guard.id != hits.mafiaVictimId) {
                     mark(guard.id, DeathCause.BODYGUARD)
@@ -151,8 +216,8 @@ object GameRules {
                 mark(hits.mafiaVictimId, DeathCause.KILLED)
             }
         }
-        if (hits.killerVictimId != null && hits.killerVictimId !in deaths) {
-            mark(hits.killerVictimId, DeathCause.KILLED)
+        listOf(hits.killerVictimId, hits.vigVictimId, hits.poisonVictimId).forEach { id ->
+            if (id != null && id !in deaths) mark(id, DeathCause.KILLED)
         }
         addTwinDeaths(players, deaths)
 
@@ -160,7 +225,18 @@ object GameRules {
             val p = players.first { it.id == id }
             DeathRecord(p.name, p.role, cause)
         }
-        val next = players.map { if (it.id in deaths) it.copy(alive = false) else it }
+        val convertId = hits.mafiaVictimId?.takeIf { id ->
+            id !in deaths &&
+                bodyguardTargetId != id &&
+                players.any { it.id == id && it.alive && it.role == Role.CURSED }
+        }
+        val next = players.map { p ->
+            when {
+                p.id in deaths -> p.copy(alive = false)
+                p.id == convertId -> p.copy(role = Role.MAFIA)
+                else -> p
+            }
+        }
         return next to records
     }
 
@@ -228,9 +304,15 @@ object GameRules {
             .sortedByDescending { it.second }
     }
 
-    fun resolveDayPhoneVote(votes: Map<String, String>): String? {
+    fun resolveDayPhoneVote(votes: Map<String, String>, doubleVoterId: String? = null): String? {
         if (votes.isEmpty()) return null
-        val counts = votes.values.groupingBy { it }.eachCount()
+        val weighted = buildList {
+            votes.forEach { (voter, target) ->
+                add(target)
+                if (voter == doubleVoterId) add(target)
+            }
+        }
+        val counts = weighted.groupingBy { it }.eachCount()
         val max = counts.values.maxOrNull() ?: return null
         val tied = counts.filter { it.value == max }.keys.toList()
         return if (tied.size == 1) tied.first() else null
@@ -264,7 +346,65 @@ object GameRules {
         }
     }
 
-    fun copSeesEvil(target: Player): Boolean = target.role?.team == Team.EVIL
+    fun copSeesEvil(target: Player, framedId: String? = null): Boolean {
+        if (target.id == framedId) return true
+        if (target.role == Role.TRAITOR) return false
+        return target.side == Team.EVIL
+    }
 
     fun killerActsTonight(nightNumber: Int): Boolean = nightNumber % 2 == 0
+
+    fun whoreTargets(living: List<Player>, actorId: String, lastTargetId: String?): List<Player> =
+        living.filter { it.id != actorId && it.id != lastTargetId }
+
+    fun nightAfterBlock(
+        players: List<Player>,
+        blockedId: String?,
+        mafiaVotes: Map<String, String>,
+        healTargetId: String?,
+        bodyguardTargetId: String?,
+        killerTargetId: String?,
+        vigilanteTargetId: String? = null,
+        poisonTargetId: String? = null,
+        framedId: String? = null,
+    ): NightActions {
+        if (blockedId == null) {
+            return NightActions(
+                mafiaVotes, healTargetId, bodyguardTargetId, killerTargetId,
+                vigilanteTargetId, poisonTargetId, framedId,
+            )
+        }
+        val role = players.firstOrNull { it.id == blockedId }?.role
+        return NightActions(
+            mafiaVotes = mafiaVotes - blockedId,
+            healTargetId = if (role == Role.HEALER) null else healTargetId,
+            bodyguardTargetId = if (role == Role.BODYGUARD) null else bodyguardTargetId,
+            killerTargetId = if (role == Role.KILLER) null else killerTargetId,
+            vigilanteTargetId = if (role == Role.VIGILANTE) null else vigilanteTargetId,
+            poisonTargetId = if (role == Role.POISONER) null else poisonTargetId,
+            framedId = if (role == Role.FRAMER) null else framedId,
+        )
+    }
+
+    data class NightActions(
+        val mafiaVotes: Map<String, String>,
+        val healTargetId: String?,
+        val bodyguardTargetId: String?,
+        val killerTargetId: String?,
+        val vigilanteTargetId: String? = null,
+        val poisonTargetId: String? = null,
+        val framedId: String? = null,
+    )
+
+    fun amnesiacCanTake(role: Role?): Boolean {
+        if (role == null) return false
+        return role !in setOf(
+            Role.AMNESIAC, Role.TWIN_CIVIL, Role.TWIN_MAFIA, Role.WHORE,
+        )
+    }
+
+    fun deadTakeable(players: List<Player>): List<Player> =
+        players.filter { !it.alive && amnesiacCanTake(it.role) }
+
+    fun deadPlayers(players: List<Player>): List<Player> = players.filter { !it.alive }
 }

@@ -1,9 +1,14 @@
 package com.secretmafia.ui.screens
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
@@ -20,13 +26,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.secretmafia.game.GameRules
 import com.secretmafia.game.Role
+import com.secretmafia.game.RoleChances
 import com.secretmafia.game.RoleCounts
+import com.secretmafia.game.Team
+import com.secretmafia.game.Wallet
+import com.secretmafia.ui.components.BuyRoleDialog
+import com.secretmafia.ui.components.MiniBtn
 import com.secretmafia.ui.components.PixelButton
 import com.secretmafia.ui.components.PixelScreen
 import com.secretmafia.ui.components.PixelText
+import com.secretmafia.ui.components.SettingRow
 import com.secretmafia.ui.components.Stepper
 import com.secretmafia.ui.components.VSpace
-import com.secretmafia.ui.theme.PixelFamily
+import com.secretmafia.ui.theme.LocalFont
 import com.secretmafia.ui.theme.pal
 import com.secretmafia.ui.theme.str
 
@@ -34,24 +46,32 @@ import com.secretmafia.ui.theme.str
 fun SetupScreen(
     counts: RoleCounts,
     onCounts: (RoleCounts) -> Unit,
-    onPlayerCount: (Int) -> Unit,
-    onStart: (names: List<String>, counts: RoleCounts) -> Unit,
-    onAdvanced: () -> Unit,
+    chances: RoleChances,
+    onChances: (RoleChances) -> Unit,
+    advancedOpen: Boolean,
+    onAdvancedOpen: (Boolean) -> Unit,
+    savedNames: List<String>,
+    onNamesChange: (List<String>) -> Unit,
+    wallet: Wallet,
+    onUnlockRole: (Role) -> Unit,
+    narratorEnabled: Boolean,
+    onNarratorToggle: () -> Unit,
+    onClearSetup: () -> Unit,
+    setupRevision: Int,
+    onStart: (names: List<String>, counts: RoleCounts, chances: RoleChances) -> Unit,
     onBack: () -> Unit,
 ) {
     val s = str()
     val c = pal()
-    var names by remember { mutableStateOf(MutableList(6) { "" }) }
+    var names by remember(setupRevision) { mutableStateOf(savedNames.toMutableList()) }
+    var buyRole by remember { mutableStateOf<Role?>(null) }
 
-    LaunchedEffect(names.size) {
-        onPlayerCount(names.size)
-        val rec = GameRules.recommendedCounts(names.size)
-        val advanced = Role.entries.filter { !it.core }.associateWith { counts[it] }
-        var next = rec
-        advanced.forEach { (role, n) ->
-            if (n > 0) next = next.with(role, n).with(Role.CIVILIAN, (next[Role.CIVILIAN] - n).coerceAtLeast(0))
-        }
-        onCounts(next)
+    LaunchedEffect(names) {
+        onNamesChange(names.toList())
+    }
+
+    fun setRole(role: Role, next: Int) {
+        onCounts(counts.with(role, next))
     }
 
     val filled = names.map { it.trim() }.filter { it.isNotEmpty() }
@@ -62,7 +82,17 @@ fun SetupScreen(
     val rolesOk = counts.total == names.size &&
         GameRules.isTwinCountOk(counts[Role.TWIN_CIVIL]) &&
         GameRules.isTwinCountOk(counts[Role.TWIN_MAFIA])
-    val canStart = namesOk && rolesOk
+    val balanceOk = !GameRules.tooManyEvil(counts)
+    val canStart = namesOk && rolesOk && balanceOk
+
+    buyRole?.let { role ->
+        BuyRoleDialog(
+            role = role,
+            wallet = wallet,
+            onUnlock = { onUnlockRole(role) },
+            onClose = { buyRole = null },
+        )
+    }
 
     PixelScreen(scroll = true) {
         PixelText(s.newGame, size = 28, bold = true)
@@ -90,7 +120,9 @@ fun SetupScreen(
 
         VSpace(22.dp)
         PixelText(s.roles, size = 22, bold = true)
-        PixelText(s.recommendedFor(names.size), size = 13)
+        if (!advancedOpen) {
+            PixelText(s.recommendedFor(names.size), size = 13)
+        }
         VSpace(10.dp)
         CoreStepper(Role.MAFIA, counts, onCounts)
         VSpace(8.dp)
@@ -100,23 +132,91 @@ fun SetupScreen(
         VSpace(8.dp)
         CoreStepper(Role.CIVILIAN, counts, onCounts)
         VSpace(10.dp)
-        PixelButton("${s.advanced}  (${counts.advancedTotal})", onClick = onAdvanced)
-        VSpace(8.dp)
-        PixelButton(s.resetRec) { onCounts(GameRules.recommendedCounts(names.size)) }
+        SettingRow(
+            s.advanced,
+            if (advancedOpen) s.on else s.off,
+        ) { onAdvancedOpen(!advancedOpen) }
+
+        if (advancedOpen) {
+            VSpace(14.dp)
+            PixelText(s.goodRoles, size = 14)
+            VSpace(8.dp)
+            AdvSlot(Role.HUNTER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.SEER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.BODYGUARD, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.MAYOR, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.NECROMANCER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.VIGILANTE, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            TwinSlot(Role.TWIN_CIVIL, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+
+            VSpace(16.dp)
+            PixelText(s.evilRoles, size = 14)
+            VSpace(8.dp)
+            AdvSlot(Role.DON, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.LAWYER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.FRAMER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.TRAITOR, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.POISONER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            TwinSlot(Role.TWIN_MAFIA, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+
+            VSpace(16.dp)
+            PixelText(s.wildRoles, size = 14)
+            VSpace(8.dp)
+            AdvSlot(Role.JOKER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.KILLER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.LUNATIC, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.DRUNK, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.WHORE, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.CURSED, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.SURVIVOR, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            VSpace(8.dp)
+            AdvSlot(Role.AMNESIAC, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+        }
+
+        VSpace(10.dp)
+        if (!advancedOpen) {
+            PixelButton(s.resetRec) { onCounts(GameRules.recommendedCounts(names.size)) }
+            VSpace(8.dp)
+        }
+        PixelButton(s.clearSetup, onClick = onClearSetup)
 
         if (counts.total != names.size) {
             VSpace(8.dp)
+            PixelText(s.rolesVsPlayers(counts.total, names.size), size = 14, color = c.accent)
             PixelText(s.roleMismatch, size = 14, color = c.accent)
         }
-        EvilBalanceHint(counts, names.size)
+        if (!GameRules.isTwinCountOk(counts[Role.TWIN_CIVIL]) ||
+            !GameRules.isTwinCountOk(counts[Role.TWIN_MAFIA])
+        ) {
+            VSpace(8.dp)
+            PixelText(s.twinsNeedPair, size = 14, color = c.accent)
+        }
+        RoleSplitHint(counts, names.size, showOptimal = !advancedOpen)
 
         VSpace(22.dp)
+        SettingRow(s.narrator, if (narratorEnabled) s.on else s.off, onNarratorToggle)
         PixelButton(
-            label = if (GameRules.tooManyEvil(counts) && rolesOk) s.startAnyway else s.start,
+            label = s.start,
             enabled = canStart,
-            accent = GameRules.tooManyEvil(counts) && rolesOk,
         ) {
-            onStart(names.map { it.trim() }, counts)
+            onStart(names.map { it.trim() }, counts, chances)
         }
         VSpace(8.dp)
         PixelButton(s.back, onClick = onBack)
@@ -124,11 +224,17 @@ fun SetupScreen(
 }
 
 @Composable
-private fun EvilBalanceHint(counts: RoleCounts, playerCount: Int) {
-    if (!GameRules.tooManyEvil(counts)) return
+private fun RoleSplitHint(counts: RoleCounts, playerCount: Int, showOptimal: Boolean) {
     val s = str()
     val c = pal()
     VSpace(8.dp)
+    if (showOptimal) {
+        val (evil, good) = GameRules.recommendedTeamSplit(playerCount)
+        PixelText(s.optimalSplit(playerCount, evil, good), size = 13)
+    }
+    PixelText(s.currentSplitFull(counts.evil, counts.good, counts.neutral), size = 13)
+    if (!GameRules.tooManyEvil(counts)) return
+    VSpace(4.dp)
     PixelText(
         s.tooManyEvil(playerCount, counts.evil, counts.good, GameRules.maxEvilFor(playerCount)),
         size = 14,
@@ -143,79 +249,111 @@ private fun CoreStepper(role: Role, counts: RoleCounts, onChange: (RoleCounts) -
 }
 
 @Composable
-fun AdvancedRolesScreen(
-    initial: RoleCounts,
-    playerCount: Int,
-    onDone: (RoleCounts) -> Unit,
+private fun AdvSlot(
+    role: Role,
+    counts: RoleCounts,
+    chances: RoleChances,
+    wallet: Wallet,
+    onBuy: (Role) -> Unit,
+    onCount: (Role, Int) -> Unit,
+    onChance: (Role, Int) -> Unit,
 ) {
-    val s = str()
-    var counts by remember { mutableStateOf(initial) }
-
-    fun bump(role: Role, next: Int) {
-        val old = counts[role]
-        val delta = next - old
-        var n = counts.with(role, next)
-        n = n.with(Role.CIVILIAN, (n[Role.CIVILIAN] - delta).coerceAtLeast(0))
-        counts = n
+    if (!wallet.owns(role)) {
+        LockedRoleRow(role) { onBuy(role) }
+        return
     }
-
-    PixelScreen(scroll = true) {
-        PixelText(s.advanced, size = 26, bold = true)
-        VSpace(8.dp)
-        PixelText(s.noneSelected.takeIf { counts.advancedTotal == 0 } ?: "", size = 13)
-        VSpace(12.dp)
-
-        PixelText(s.goodRoles, size = 14)
-        VSpace(8.dp)
-        Adv(Role.HUNTER, counts, 0, 2) { bump(Role.HUNTER, it) }
-        VSpace(8.dp)
-        Adv(Role.SEER, counts, 0, 1) { bump(Role.SEER, it) }
-        VSpace(8.dp)
-        Adv(Role.BODYGUARD, counts, 0, 1) { bump(Role.BODYGUARD, it) }
-        VSpace(8.dp)
-        TwinStepper(Role.TWIN_CIVIL, counts) { bump(Role.TWIN_CIVIL, it) }
-
-        VSpace(16.dp)
-        PixelText(s.evilRoles, size = 14)
-        VSpace(8.dp)
-        Adv(Role.DON, counts, 0, 1) { bump(Role.DON, it) }
-        VSpace(8.dp)
-        Adv(Role.LAWYER, counts, 0, 1) { bump(Role.LAWYER, it) }
-        VSpace(8.dp)
-        TwinStepper(Role.TWIN_MAFIA, counts) { bump(Role.TWIN_MAFIA, it) }
-
-        VSpace(16.dp)
-        PixelText(s.wildRoles, size = 14)
-        VSpace(8.dp)
-        Adv(Role.JOKER, counts, 0, 1) { bump(Role.JOKER, it) }
-        VSpace(8.dp)
-        Adv(Role.KILLER, counts, 0, 1) { bump(Role.KILLER, it) }
-        VSpace(8.dp)
-        Adv(Role.LUNATIC, counts, 0, 1) { bump(Role.LUNATIC, it) }
-        VSpace(8.dp)
-        Adv(Role.DRUNK, counts, 0, 1) { bump(Role.DRUNK, it) }
-
-        EvilBalanceHint(counts, playerCount)
-        VSpace(22.dp)
-        PixelButton(s.back) { onDone(counts) }
+    val s = str()
+    Stepper(s.roleTitle(role), counts[role], min = 0, max = GameRules.MAX_PLAYERS) {
+        onCount(role, it)
+    }
+    if (counts[role] > 0) {
+        VSpace(4.dp)
+        ChanceRow(role, chances[role], onChance)
     }
 }
 
 @Composable
-private fun Adv(role: Role, counts: RoleCounts, min: Int, max: Int, onChange: (Int) -> Unit) {
+private fun TwinSlot(
+    role: Role,
+    counts: RoleCounts,
+    chances: RoleChances,
+    wallet: Wallet,
+    onBuy: (Role) -> Unit,
+    onCount: (Role, Int) -> Unit,
+    onChance: (Role, Int) -> Unit,
+) {
+    if (!wallet.owns(role)) {
+        LockedRoleRow(role) { onBuy(role) }
+        return
+    }
     val s = str()
-    Stepper(s.roleTitle(role), counts[role], min = min, max = max, onChange = onChange)
+    Stepper(s.roleTitle(role), counts[role], min = 0, max = GameRules.MAX_PLAYERS, step = 2) { next ->
+        onCount(role, next)
+    }
+    if (counts[role] > 0) {
+        VSpace(4.dp)
+        ChanceRow(role, chances[role], onChance)
+    }
 }
 
 @Composable
-private fun TwinStepper(role: Role, counts: RoleCounts, onChange: (Int) -> Unit) {
+private fun ChanceRow(role: Role, percent: Int, onChance: (Role, Int) -> Unit) {
     val s = str()
     val c = pal()
-    Stepper(s.roleTitle(role), counts[role], min = 0, max = 2) { raw ->
-        onChange(if (raw >= 2) 2 else 0)
+    val hint = when (role.team) {
+        Team.EVIL -> s.spawnHintEvil
+        Team.GOOD -> s.spawnHintGood
+        Team.NEUTRAL -> s.spawnHintWild
     }
-    PixelText(s.roleBlurb(role), size = 13, color = c.muted)
-    VSpace(8.dp)
+    Column(Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(2.dp, c.muted)
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            PixelText(
+                s.spawnChance(percent),
+                size = 14,
+                bold = true,
+                align = TextAlign.Start,
+                modifier = Modifier.weight(1f),
+            )
+            MiniBtn("-") { if (percent > 0) onChance(role, percent - 10) }
+            Box(Modifier.width(48.dp), contentAlignment = Alignment.Center) {
+                PixelText("$percent%", size = 16, bold = true)
+            }
+            MiniBtn("+") { if (percent < 100) onChance(role, percent + 10) }
+        }
+        VSpace(4.dp)
+        PixelText(hint, size = 12, color = c.muted, align = TextAlign.Start)
+    }
+}
+
+@Composable
+private fun LockedRoleRow(role: Role, onBuy: () -> Unit) {
+    val s = str()
+    val c = pal()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(2.dp, c.fg)
+            .clickable(onClick = onBuy)
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        PixelText(
+            s.roleTitle(role),
+            size = 16,
+            bold = true,
+            align = TextAlign.Start,
+            modifier = Modifier.weight(1f),
+        )
+        PixelText(s.buyFirst, size = 16, bold = true, color = c.accent)
+    }
 }
 
 @Composable
@@ -236,7 +374,7 @@ private fun NameField(
             cursorBrush = SolidColor(c.fg),
             textStyle = TextStyle(
                 color = c.fg,
-                fontFamily = PixelFamily,
+                fontFamily = LocalFont.current,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
             ),
