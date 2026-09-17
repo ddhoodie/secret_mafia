@@ -1,6 +1,5 @@
 package com.secretmafia
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,13 +16,22 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.secretmafia.data.SettingsStore
 import com.secretmafia.game.AppSettings
+import com.secretmafia.game.CoinKind
 import com.secretmafia.game.GameRules
 import com.secretmafia.game.GameViewModel
+import com.secretmafia.game.Progress
+import com.secretmafia.game.GamePhase
+import com.secretmafia.game.Profile
 import com.secretmafia.game.Role
+import com.secretmafia.game.RoleChances
 import com.secretmafia.game.RoleCounts
+import com.secretmafia.game.Wallet
 import com.secretmafia.ui.screens.AboutScreen
+import com.secretmafia.ui.screens.AnimDebugScreen
 import com.secretmafia.ui.screens.ComingSoonScreen
-import com.secretmafia.ui.screens.AdvancedRolesScreen
+import com.secretmafia.ui.screens.ProfileScreen
+import com.secretmafia.ui.screens.RoleUnlockDetail
+import com.secretmafia.ui.screens.RolesCatalogScreen
 import com.secretmafia.ui.screens.AppearanceScreen
 import com.secretmafia.ui.screens.GameScreen
 import com.secretmafia.ui.screens.GameplayDayScreen
@@ -40,6 +48,7 @@ import com.secretmafia.ui.screens.SetupScreen
 import com.secretmafia.ui.theme.ProvideAppStyle
 import com.secretmafia.ui.theme.SecretMafiaTheme
 import com.secretmafia.ui.theme.str
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
@@ -48,19 +57,64 @@ fun SecretMafiaApp(
     gameVm: GameViewModel = viewModel(),
 ) {
     val settings by store.settings.collectAsStateWithLifecycle(initialValue = AppSettings())
+    val wallet by store.wallet.collectAsStateWithLifecycle(initialValue = Wallet())
+    val profile by store.profile.collectAsStateWithLifecycle(initialValue = Profile())
+    var playerNames by remember { mutableStateOf<List<String>?>(null) }
+    var setupCounts by remember { mutableStateOf<RoleCounts?>(null) }
+    var setupAdvanced by remember { mutableStateOf(false) }
+    var setupChances by remember { mutableStateOf(RoleChances()) }
+    var setupRevision by remember { mutableStateOf(0) }
+    val adWatches by store.adWatches.collectAsStateWithLifecycle(initialValue = 0)
     val game by gameVm.state.collectAsStateWithLifecycle()
     val nav = rememberNavController()
     val scope = rememberCoroutineScope()
-    var setupCounts by remember { mutableStateOf(GameRules.recommendedCounts(6)) }
-    var setupPlayers by remember { mutableStateOf(6) }
+    var playStatus by remember { mutableStateOf("") }
     val save: (AppSettings) -> Unit = { next -> scope.launch { store.update { next } } }
+    val saveProfile: (Profile) -> Unit = { next -> scope.launch { store.setProfile(next) } }
+    val persistSetup: (RoleCounts, Boolean, RoleChances) -> Unit = { counts, advanced, chances ->
+        scope.launch { store.setSetup(counts, advanced, chances) }
+    }
+
+    LaunchedEffect(store) {
+        store.sealWalletIfNeeded()
+        val names = store.playerNames.first()
+        val counts = store.setupCounts.first()
+        val advanced = store.setupAdvanced.first()
+        val chances = store.setupChances.first()
+        playerNames = names
+        setupCounts = counts ?: GameRules.recommendedCounts(names.size.coerceAtLeast(6))
+        setupAdvanced = advanced
+        setupChances = chances
+    }
+
+    LaunchedEffect(wallet, setupCounts) {
+        val cur = setupCounts ?: return@LaunchedEffect
+        val next = cur.onlyOwned(wallet::owns)
+        if (next != cur) {
+            setupCounts = next
+            persistSetup(next, setupAdvanced, setupChances)
+        }
+    }
+    LaunchedEffect(game?.phase, game?.matchReward, game?.matchPaid, game?.survivorLived) {
+        val s = game ?: return@LaunchedEffect
+        if (s.phase !is GamePhase.GameOver || s.matchPaid) return@LaunchedEffect
+        s.matchReward?.let { Progress.coinFrom(it) }?.let { kind ->
+            store.addCoin(kind, Progress.MATCH_REWARD)
+        }
+        if (s.survivorLived) store.addCoin(CoinKind.GOLD, Progress.MATCH_REWARD)
+        gameVm.markMatchPaid()
+    }
 
     SecretMafiaTheme {
         ProvideAppStyle(settings) {
             NavHost(navController = nav, startDestination = "menu") {
                 composable("menu") {
                     MenuScreen(
+                        wallet = wallet,
+                        profile = profile,
+                        onProfile = { nav.navigate("profile") },
                         onPlay = { nav.navigate("setup") },
+                        onRoles = { nav.navigate("roles") },
                         onSettings = { nav.navigate("settings") },
                         onRules = { nav.navigate("rules") },
                         onStats = { nav.navigate("stats") },
@@ -73,6 +127,9 @@ fun SecretMafiaApp(
                         onGameplay = { nav.navigate("settings/gameplay") },
                         onBack = { nav.popBackStack() },
                     )
+                }
+                composable("settings/debug") {
+                    AnimDebugScreen { nav.popBackStack() }
                 }
                 composable("settings/appearance") {
                     AppearanceScreen(settings, save) { nav.popBackStack() }
@@ -93,6 +150,62 @@ fun SecretMafiaApp(
                 }
                 composable("settings/gameplay/day") {
                     GameplayDayScreen(settings, save) { nav.popBackStack() }
+                }
+                composable("profile") {
+                    val s = str()
+                    ProfileScreen(
+                        profile = profile,
+                        status = playStatus,
+                        onName = { saveProfile(profile.copy(name = it)) },
+                        onAvatar = { saveProfile(profile.copy(avatarId = it)) },
+                        onSignIn = {
+                            playStatus = ""
+                            saveProfile(profile.copy(playSignedIn = !profile.playSignedIn))
+                        },
+                        onSave = {
+                            scope.launch {
+                                playStatus = if (store.saveToPlayStub()) s.playSaved else s.playNeedSignIn
+                            }
+                        },
+                        onLoad = {
+                            scope.launch {
+                                playStatus = if (store.loadFromPlayStub()) s.playLoaded else s.playEmpty
+                            }
+                        },
+                        onBack = { nav.popBackStack() },
+                    )
+                }
+                composable("roles") {
+                    RolesCatalogScreen(
+                        wallet = wallet,
+                        adWatches = adWatches,
+                        onRole = { nav.navigate("roles/${it.name}") },
+                        onWatchAd = { scope.launch { store.recordAdWatch() } },
+                        onPickAdCoin = { kind -> scope.launch { store.claimAdCoin(kind) } },
+                        onBack = { nav.popBackStack() },
+                    )
+                }
+                composable(
+                    "roles/{role}",
+                    arguments = listOf(navArgument("role") { type = NavType.StringType }),
+                ) { entry ->
+                    val role = runCatching {
+                        Role.valueOf(entry.arguments?.getString("role") ?: "")
+                    }.getOrNull()
+                    if (role == null) {
+                        LaunchedEffect(Unit) { nav.popBackStack() }
+                    } else {
+                        RoleUnlockDetail(
+                            role = role,
+                            wallet = wallet,
+                            whoreAlign = settings.whoreAlign,
+                            onCycleWhoreAlign = {
+                                save(settings.copy(whoreAlign = settings.whoreAlign.next()))
+                            },
+                            onUnlock = { scope.launch { store.unlockRole(role) } },
+                            onBack = { nav.popBackStack() },
+                        )
+                    }
                 }
                 composable("about") { AboutScreen { nav.popBackStack() } }
                 composable("stats") {
@@ -146,37 +259,80 @@ fun SecretMafiaApp(
                     }
                 }
                 composable("setup") {
+                    val saved = playerNames
+                    val counts = setupCounts
+                    if (saved == null || counts == null) return@composable
                     SetupScreen(
-                        counts = setupCounts,
-                        onCounts = { setupCounts = it },
-                        onPlayerCount = { setupPlayers = it },
-                        onStart = { names, counts ->
-                            gameVm.start(names, counts, settings)
+                        counts = counts,
+                        onCounts = {
+                            setupCounts = it
+                            persistSetup(it, setupAdvanced, setupChances)
+                        },
+                        chances = setupChances,
+                        onChances = {
+                            setupChances = it
+                            val cur = setupCounts ?: return@SetupScreen
+                            persistSetup(cur, setupAdvanced, it)
+                        },
+                        advancedOpen = setupAdvanced,
+                        onAdvancedOpen = { open ->
+                            setupAdvanced = open
+                            val cur = setupCounts ?: return@SetupScreen
+                            persistSetup(cur, open, setupChances)
+                        },
+                        savedNames = saved,
+                        onNamesChange = { next ->
+                            playerNames = next
+                            scope.launch { store.setPlayerNames(next) }
+                        },
+                        wallet = wallet,
+                        onUnlockRole = { role -> scope.launch { store.unlockRole(role) } },
+                        narratorEnabled = settings.narratorEnabled,
+                        onNarratorToggle = { save(settings.copy(narratorEnabled = !settings.narratorEnabled)) },
+                        onClearSetup = {
+                            scope.launch {
+                                store.clearSetup()
+                                playerNames = List(6) { "" }
+                                setupCounts = GameRules.recommendedCounts(6)
+                                setupAdvanced = false
+                                setupChances = RoleChances()
+                                setupRevision += 1
+                            }
+                        },
+                        setupRevision = setupRevision,
+                        onStart = { names, roleCounts, chances ->
+                            gameVm.start(names, roleCounts.onlyOwned(wallet::owns), settings, chances)
                             nav.navigate("game")
                         },
-                        onAdvanced = { nav.navigate("setup/advanced") },
                         onBack = { nav.popBackStack() },
                     )
-                }
-                composable("setup/advanced") {
-                    AdvancedRolesScreen(setupCounts, setupPlayers) {
-                        setupCounts = it
-                        nav.popBackStack()
-                    }
                 }
                 composable("game") {
                     val state = game
                     if (state == null) {
-                        LaunchedEffect(Unit) { nav.popBackStack() }
+                        LaunchedEffect(Unit) {
+                            nav.navigate("menu") {
+                                popUpTo("menu") { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        }
                     } else {
-                        BackHandler {
-                            gameVm.clear()
-                            nav.popBackStack()
-                        }
-                        GameScreen(gameVm, state) {
-                            gameVm.clear()
-                            nav.popBackStack("menu", inclusive = false)
-                        }
+                        GameScreen(
+                            vm = gameVm,
+                            state = state,
+                            wallet = wallet,
+                            onQuit = {
+                                nav.navigate("menu") {
+                                    popUpTo("menu") { inclusive = true }
+                                    launchSingleTop = true
+                                }
+                                gameVm.clear()
+                            },
+                            onNarratorChange = { on ->
+                                gameVm.patchSettings { it.copy(narratorEnabled = on) }
+                                save(settings.copy(narratorEnabled = on))
+                            },
+                        )
                     }
                 }
             }
