@@ -1,5 +1,6 @@
 package com.secretmafia
 
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -7,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -29,6 +31,7 @@ import com.secretmafia.game.Wallet
 import com.secretmafia.ui.screens.AboutScreen
 import com.secretmafia.ui.screens.AnimDebugScreen
 import com.secretmafia.ui.screens.ComingSoonScreen
+import com.secretmafia.ui.screens.PrivacyScreen
 import com.secretmafia.ui.screens.ProfileScreen
 import com.secretmafia.ui.screens.RoleUnlockDetail
 import com.secretmafia.ui.screens.RolesCatalogScreen
@@ -64,10 +67,11 @@ fun SecretMafiaApp(
     var setupAdvanced by remember { mutableStateOf(false) }
     var setupChances by remember { mutableStateOf(RoleChances()) }
     var setupRevision by remember { mutableStateOf(0) }
-    val adWatches by store.adWatches.collectAsStateWithLifecycle(initialValue = 0)
     val game by gameVm.state.collectAsStateWithLifecycle()
     val nav = rememberNavController()
     val scope = rememberCoroutineScope()
+    val activity = LocalContext.current as ComponentActivity
+    val playCloud = (activity.application as MafiaApp).playCloud
     var playStatus by remember { mutableStateOf("") }
     val save: (AppSettings) -> Unit = { next -> scope.launch { store.update { next } } }
     val saveProfile: (Profile) -> Unit = { next -> scope.launch { store.setProfile(next) } }
@@ -103,6 +107,12 @@ fun SecretMafiaApp(
         }
         if (s.survivorLived) store.addCoin(CoinKind.GOLD, Progress.MATCH_REWARD)
         gameVm.markMatchPaid()
+        if (profile.playSignedIn) {
+            var next = wallet
+            s.matchReward?.let { Progress.coinFrom(it) }?.let { next = Progress.grant(next, it, Progress.MATCH_REWARD) }
+            if (s.survivorLived) next = Progress.grant(next, CoinKind.GOLD, Progress.MATCH_REWARD)
+            playCloud.save(activity, next, profile)
+        }
     }
 
     SecretMafiaTheme {
@@ -156,20 +166,42 @@ fun SecretMafiaApp(
                     ProfileScreen(
                         profile = profile,
                         status = playStatus,
+                        playReady = playCloud.configured(),
                         onName = { saveProfile(profile.copy(name = it)) },
                         onAvatar = { saveProfile(profile.copy(avatarId = it)) },
                         onSignIn = {
-                            playStatus = ""
-                            saveProfile(profile.copy(playSignedIn = !profile.playSignedIn))
+                            scope.launch {
+                                playStatus = ""
+                                val ok = playCloud.signIn(activity)
+                                saveProfile(profile.copy(playSignedIn = ok))
+                                playStatus = if (ok) {
+                                    val loaded = playCloud.load(activity)
+                                    if (loaded != null) {
+                                        store.applyCloud(loaded.first, loaded.second)
+                                        s.playLoaded
+                                    } else {
+                                        playCloud.save(activity, wallet, profile.copy(playSignedIn = true))
+                                        s.signedIn
+                                    }
+                                } else {
+                                    s.playSignInFail
+                                }
+                            }
                         },
                         onSave = {
                             scope.launch {
-                                playStatus = if (store.saveToPlayStub()) s.playSaved else s.playNeedSignIn
+                                playStatus = if (playCloud.save(activity, wallet, profile)) s.playSaved else s.playNeedSignIn
                             }
                         },
                         onLoad = {
                             scope.launch {
-                                playStatus = if (store.loadFromPlayStub()) s.playLoaded else s.playEmpty
+                                val loaded = playCloud.load(activity)
+                                playStatus = if (loaded != null) {
+                                    store.applyCloud(loaded.first, loaded.second)
+                                    s.playLoaded
+                                } else {
+                                    s.playEmpty
+                                }
                             }
                         },
                         onBack = { nav.popBackStack() },
@@ -178,10 +210,7 @@ fun SecretMafiaApp(
                 composable("roles") {
                     RolesCatalogScreen(
                         wallet = wallet,
-                        adWatches = adWatches,
                         onRole = { nav.navigate("roles/${it.name}") },
-                        onWatchAd = { scope.launch { store.recordAdWatch() } },
-                        onPickAdCoin = { kind -> scope.launch { store.claimAdCoin(kind) } },
                         onBack = { nav.popBackStack() },
                     )
                 }
@@ -207,7 +236,15 @@ fun SecretMafiaApp(
                         )
                     }
                 }
-                composable("about") { AboutScreen { nav.popBackStack() } }
+                composable("about") {
+                    AboutScreen(
+                        onPrivacy = { nav.navigate("about/privacy") },
+                        onBack = { nav.popBackStack() },
+                    )
+                }
+                composable("about/privacy") {
+                    PrivacyScreen { nav.popBackStack() }
+                }
                 composable("stats") {
                     val s = str()
                     ComingSoonScreen(s.statistics, s.statsSoon) { nav.popBackStack() }

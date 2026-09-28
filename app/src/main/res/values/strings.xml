@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Secret Mafia</string>
+    <string name="app_name">One Phone Secret Mafia</string>
+    <!-- Play Console → Play Games Services → the numeric project ID. Leave 0 until that exists. -->
+    <string name="game_services_project_id" translatable="false">\u0030</string>
 </resources>

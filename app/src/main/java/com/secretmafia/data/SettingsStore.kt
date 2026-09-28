@@ -54,13 +54,6 @@ class SettingsStore(private val context: Context) {
     private val profileName = stringPreferencesKey("profile_name")
     private val avatarId = intPreferencesKey("avatar_id")
     private val playSignedIn = booleanPreferencesKey("play_signed_in")
-    private val cloudBlood = intPreferencesKey("cloud_blood")
-    private val cloudTown = intPreferencesKey("cloud_town")
-    private val cloudGold = intPreferencesKey("cloud_gold")
-    private val cloudUnlocked = stringPreferencesKey("cloud_unlocked")
-    private val cloudName = stringPreferencesKey("cloud_name")
-    private val cloudAvatar = intPreferencesKey("cloud_avatar")
-    private val cloudExists = booleanPreferencesKey("cloud_exists")
     private val playerNamesKey = stringPreferencesKey("player_names")
     private val setupCountsKey = stringPreferencesKey("setup_counts")
     private val setupAdvancedKey = booleanPreferencesKey("setup_advanced")
@@ -181,44 +174,13 @@ class SettingsStore(private val context: Context) {
         return ok
     }
 
-    suspend fun saveToPlayStub(): Boolean {
-        var ok = false
+    suspend fun applyCloud(wallet: Wallet, profile: Profile) {
         context.dataStore.edit { p ->
-            if (p[playSignedIn] != true) return@edit
-            val w = p.toWallet()
-            val prof = p.toProfile()
-            p[cloudBlood] = w.blood
-            p[cloudTown] = w.town
-            p[cloudGold] = w.gold
-            p[cloudUnlocked] = w.unlocked.joinToString(",") { it.name }
-            p[cloudName] = prof.name
-            p[cloudAvatar] = prof.avatarId
-            p[cloudExists] = true
-            ok = true
+            p.writeWallet(wallet)
+            p[profileName] = profile.name.take(16)
+            p[avatarId] = profile.avatarId.coerceIn(0, Progress.AVATAR_COUNT - 1)
+            p[playSignedIn] = true
         }
-        return ok
-    }
-
-    suspend fun loadFromPlayStub(): Boolean {
-        var ok = false
-        context.dataStore.edit { p ->
-            if (p[playSignedIn] != true || p[cloudExists] != true) return@edit
-            p.writeWallet(
-                Wallet(
-                    blood = p[cloudBlood] ?: 0,
-                    town = p[cloudTown] ?: 0,
-                    gold = p[cloudGold] ?: 0,
-                    unlocked = p[cloudUnlocked].orEmpty()
-                        .split(",")
-                        .mapNotNull { runCatching { Role.valueOf(it) }.getOrNull() }
-                        .toSet(),
-                ),
-            )
-            p[profileName] = p[cloudName].orEmpty()
-            p[avatarId] = p[cloudAvatar] ?: 0
-            ok = true
-        }
-        return ok
     }
 
     private fun androidx.datastore.preferences.core.Preferences.toSettings(): AppSettings {
