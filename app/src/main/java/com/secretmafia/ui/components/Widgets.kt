@@ -254,6 +254,7 @@ fun DrainBar(
 fun SettingRow(
     title: String,
     value: String,
+    hint: String? = null,
     onClick: () -> Unit,
 ) {
     val c = pal()
@@ -269,6 +270,10 @@ fun SettingRow(
         PixelText(title, size = 15, bold = true, align = TextAlign.Start, modifier = Modifier.weight(1f))
         Spacer(Modifier.width(12.dp))
         PixelText(value, size = 15)
+    }
+    if (!hint.isNullOrBlank()) {
+        Spacer(Modifier.height(6.dp))
+        PixelText(hint, size = 13, color = c.muted, align = TextAlign.Start, modifier = Modifier.fillMaxWidth())
     }
     Spacer(Modifier.height(10.dp))
 }

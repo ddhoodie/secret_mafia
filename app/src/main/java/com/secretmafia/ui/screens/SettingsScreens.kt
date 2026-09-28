@@ -41,24 +41,23 @@ fun AppearanceScreen(
     PixelScreen(scroll = true) {
         PixelText(s.appearance, size = 28, bold = true)
         VSpace()
-        SettingRow(s.lightTheme, onOff(s, settings.lightTheme)) {
+        SettingRow(s.lightTheme, onOff(s, settings.lightTheme), s.lightThemeHint) {
             onChange(settings.copy(lightTheme = !settings.lightTheme))
         }
-        SettingRow(s.language, settings.language.nativeName) {
+        SettingRow(s.language, settings.language.nativeName, s.languageHint) {
             onChange(settings.copy(language = settings.language.next()))
         }
-        SettingRow(s.hideColors, onOff(s, settings.hideGameColors)) {
+        SettingRow(s.hideColors, onOff(s, settings.hideGameColors), s.hideColorsHint) {
             onChange(settings.copy(hideGameColors = !settings.hideGameColors))
         }
-        PixelText(s.hideColorsHint, size = 13)
         VSpace()
-        SettingRow(s.sound, onOff(s, settings.soundEnabled)) {
+        SettingRow(s.sound, onOff(s, settings.soundEnabled), s.soundHint) {
             onChange(settings.copy(soundEnabled = !settings.soundEnabled))
         }
-        SettingRow(s.vibration, onOff(s, settings.vibrationEnabled)) {
+        SettingRow(s.vibration, onOff(s, settings.vibrationEnabled), s.vibrationHint) {
             onChange(settings.copy(vibrationEnabled = !settings.vibrationEnabled))
         }
-        SettingRow(s.narrator, onOff(s, settings.narratorEnabled)) {
+        SettingRow(s.narrator, onOff(s, settings.narratorEnabled), s.narratorHint) {
             onChange(settings.copy(narratorEnabled = !settings.narratorEnabled))
         }
         VSpace()
@@ -97,7 +96,7 @@ fun GameplayRolesScreen(
     PixelScreen(scroll = true) {
         PixelText(s.roles, size = 28, bold = true)
         VSpace()
-        SettingRow(s.healerRepeat, onOff(s, settings.healerMayRepeatTarget)) {
+        SettingRow(s.healerRepeat, onOff(s, settings.healerMayRepeatTarget), s.healerRepeatHint) {
             onChange(settings.copy(healerMayRepeatTarget = !settings.healerMayRepeatTarget))
         }
         VSpace()
@@ -115,23 +114,22 @@ fun GameplayNightScreen(
     PixelScreen(scroll = true) {
         PixelText(s.night, size = 28, bold = true)
         VSpace()
-        SettingRow(s.firstKill, onOff(s, settings.firstNightKill)) {
+        SettingRow(s.firstKill, onOff(s, settings.firstNightKill), s.firstKillHint) {
             onChange(settings.copy(firstNightKill = !settings.firstNightKill))
         }
-        SettingRow(s.mafiaConfer, onOff(s, settings.mafiaConfer)) {
+        SettingRow(s.mafiaConfer, onOff(s, settings.mafiaConfer), s.mafiaConferHint) {
             onChange(settings.copy(mafiaConfer = !settings.mafiaConfer))
         }
-        PixelText(s.mafiaConferHint, size = 13)
         if (settings.mafiaConfer) {
             VSpace(8.dp)
-            SettingRow(s.mafiaTalkTime, s.secLabel(settings.mafiaConferSeconds)) {
+            SettingRow(s.mafiaTalkTime, s.secLabel(settings.mafiaConferSeconds), s.mafiaTalkTimeHint) {
                 onChange(settings.copy(mafiaConferSeconds = nextConferSecs(settings.mafiaConferSeconds)))
             }
         }
-        SettingRow(s.voteCount, onOff(s, settings.showMafiaVoteCount)) {
+        SettingRow(s.voteCount, onOff(s, settings.showMafiaVoteCount), s.voteCountHint) {
             onChange(settings.copy(showMafiaVoteCount = !settings.showMafiaVoteCount))
         }
-        SettingRow(s.dummyAction, dummyLabel(s, settings.dummyActionType)) {
+        SettingRow(s.dummyAction, dummyLabel(s, settings.dummyActionType), s.dummyActionHint) {
             onChange(settings.copy(dummyActionType = nextDummy(settings.dummyActionType)))
         }
         VSpace()
@@ -149,10 +147,14 @@ fun GameplayDayScreen(
     PixelScreen(scroll = true) {
         PixelText(s.day, size = 28, bold = true)
         VSpace()
-        SettingRow(s.discussTimer, s.minLabel(settings.discussTimerMinutes)) {
+        SettingRow(s.discussTimer, s.minLabel(settings.discussTimerMinutes), s.discussTimerHint) {
             onChange(settings.copy(discussTimerMinutes = nextDiscuss(settings.discussTimerMinutes)))
         }
-        SettingRow(s.dayVote, if (settings.dayVoteMode == DayVoteMode.LIVE) s.live else s.phone) {
+        SettingRow(
+            s.dayVote,
+            if (settings.dayVoteMode == DayVoteMode.LIVE) s.live else s.phone,
+            s.dayVoteHint,
+        ) {
             onChange(
                 settings.copy(
                     dayVoteMode = if (settings.dayVoteMode == DayVoteMode.LIVE) {
@@ -163,10 +165,10 @@ fun GameplayDayScreen(
                 ),
             )
         }
-        SettingRow(s.revealRole, onOff(s, settings.revealRoleOnDeath)) {
+        SettingRow(s.revealRole, onOff(s, settings.revealRoleOnDeath), s.revealRoleHint) {
             onChange(settings.copy(revealRoleOnDeath = !settings.revealRoleOnDeath))
         }
-        SettingRow(s.revealEnd, onOff(s, settings.revealRolesAtEnd)) {
+        SettingRow(s.revealEnd, onOff(s, settings.revealRolesAtEnd), s.revealEndHint) {
             onChange(settings.copy(revealRolesAtEnd = !settings.revealRolesAtEnd))
         }
         VSpace()

@@ -135,6 +135,7 @@ fun SetupScreen(
         SettingRow(
             s.advanced,
             if (advancedOpen) s.on else s.off,
+            s.advancedHint,
         ) { onAdvancedOpen(!advancedOpen) }
 
         if (advancedOpen) {
@@ -211,7 +212,7 @@ fun SetupScreen(
         RoleSplitHint(counts, names.size, showOptimal = !advancedOpen)
 
         VSpace(22.dp)
-        SettingRow(s.narrator, if (narratorEnabled) s.on else s.off, onNarratorToggle)
+        SettingRow(s.narrator, if (narratorEnabled) s.on else s.off, s.narratorHint, onNarratorToggle)
         PixelButton(
             label = s.start,
             enabled = canStart,

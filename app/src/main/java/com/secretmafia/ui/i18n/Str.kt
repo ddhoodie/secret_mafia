@@ -56,13 +56,148 @@ class Str(private val lang: AppLang) {
     val language = t("LANGUAGE", "JEZIK", "LINGUA", "IDIOMA", "SPRACHE", "LANGUE", "语言")
     val hideColors = t("HIDE GAME COLORS", "SAKRIJ BOJE U IGRI", "NASCONDI I COLORI", "OCULTAR COLORES", "FARBEN VERSTECKEN", "CACHER LES COULEURS", "隐藏游戏颜色")
     val hideColorsHint = t(
-        "NO RED / GREEN DURING PLAY",
-        "BEZ CRVENE / ZELENE U IGRI",
-        "NI ROSSO / VERDE IN PARTITA",
-        "SIN ROJO / VERDE EN JUEGO",
-        "KEIN ROT / GRÜN IM SPIEL",
-        "PAS DE ROUGE / VERT EN JEU",
-        "对局中不显示红/绿",
+        "NO RED / GREEN DURING PLAY. KILLS AND HEALS USE WHITE SO THE TABLE CANNOT READ THE SCREEN FROM COLOR.",
+        "BEZ CRVENE / ZELENE U IGRI. UBISTVA I HEAL IDU BELO DA STO NE ČITA EKRAN PO BOJI.",
+        "NI ROSSO / VERDE IN PARTITA. UCCISIONI E CURE RESTANO BIANCHE COSÌ IL TAVOLO NON LEGGE LO SCHERMO DAL COLORE.",
+        "SIN ROJO / VERDE EN JUEGO. MUERTES Y CURAS VAN EN BLANCO PARA QUE LA MESA NO LEA LA PANTALLA POR EL COLOR.",
+        "KEIN ROT / GRÜN IM SPIEL. MORDE UND HEILUNG BLEIBEN WEISS, DAMIT DER TISCH DIE FARBE NICHT LIEST.",
+        "PAS DE ROUGE / VERT EN JEU. MEURTRES ET SOINS RESTENT BLANCS POUR QUE LA TABLE NE LISE PAS L'ÉCRAN À LA COULEUR.",
+        "对局中不显示红/绿。击杀和治疗用白，避免旁人从颜色看出屏幕。",
+    )
+    val lightThemeHint = t(
+        "WHITE BACKGROUND, BLACK TEXT. THE LOGO INVERTS. RED STAYS RED.",
+        "BELA POZADINA, CRNI TEKST. LOGO SE INVERTUJE. CRVENA OSTAJE CRVENA.",
+        "SFONDO BIANCO, TESTO NERO. IL LOGO SI INVERTE. IL ROSSO RESTA ROSSO.",
+        "FONDO BLANCO, TEXTO NEGRO. EL LOGO SE INVIERTE. EL ROJO SIGUE ROJO.",
+        "WEISSER HINTERGRUND, SCHWARZER TEXT. DAS LOGO INVERTIERT. ROT BLEIBT ROT.",
+        "FOND BLANC, TEXTE NOIR. LE LOGO S'INVERSE. LE ROUGE RESTE ROUGE.",
+        "白底黑字。标志反色。红色仍是红色。",
+    )
+    val languageHint = t(
+        "MENUS AND ROLE TEXT. THE NARRATOR VOICE STAYS ENGLISH.",
+        "MENIJI I TEKST ULOGA. GLAS VODIČA OSTAJE ENGLESKI.",
+        "MENU E TESTI DEI RUOLI. LA VOCE DEL NARRATORE RESTA IN INGLESE.",
+        "MENÚS Y TEXTOS DE ROLES. LA VOZ DEL NARRADOR SIGUE EN INGLÉS.",
+        "MENÜS UND ROLLENTTEXTE. DIE ERZÄHLERSTIMME BLEIBT ENGLISCH.",
+        "MENUS ET TEXTES DES RÔLES. LA VOIX DU NARRATEUR RESTE EN ANGLAIS.",
+        "菜单和身份文字。旁白仍是英语。",
+    )
+    val soundHint = t(
+        "BEEPS AND ALARMS. THE NARRATOR HAS ITS OWN TOGGLE.",
+        "BIP I ALARMI. VODIČ IMA SVOJ PREKIDAČ.",
+        "BEEP E ALLARMI. IL NARRATORE HA IL SUO INTERRUTTORE.",
+        "PITOS Y ALARMAS. EL NARRADOR TIENE SU PROPIO INTERRUPTOR.",
+        "PIEPSER UND ALARME. DER ERZÄHLER HAT SEINEN EIGENEN SCHALTER.",
+        "BIPS ET ALARMES. LE NARRATEUR A SON PROPRE INTERRUPTEUR.",
+        "提示音和闹钟。旁白有单独开关。",
+    )
+    val vibrationHint = t(
+        "PHONE VIBRATES ON HANDOFF COUNTDOWN AND UNLOCK.",
+        "TELEFON VIBRIRA NA ODBROJAVANJU I OTKLJUČAVANJU.",
+        "IL TELEFONO VIBRA AL CONTO ALLA ROVESCIA E ALLO SBLOCCO.",
+        "EL TELÉFONO VIBRA EN LA CUENTA ATRÁS Y AL DESBLOQUEAR.",
+        "DAS HANDY VIBRIERT BEIM COUNTDOWN UND ENTSPERREN.",
+        "LE TÉLÉPHONE VIBRE AU COMPTE À REBOURS ET AU DÉVERROUILLAGE.",
+        "传递倒计时和解锁时震动。",
+    )
+    val narratorHint = t(
+        "SPOKEN LINES AT NIGHT, DAY, DISCUSS, AND GAME OVER. PICKS A RANDOM CLIP EACH TIME.",
+        "GOVOR NA NOĆI, DANU, DISKUSIJI I KRAJU. SVAKI PUT UZME NASUMIČAN KLIP.",
+        "VOCE A NOTTE, GIORNO, DISCUSSIONE E FINE. OGNI VOLTA UN CLIP CASUALE.",
+        "VOZ EN NOCHE, DÍA, DEBATE Y FINAL. CADA VEZ UN CLIP AL AZAR.",
+        "STIMME BEI NACHT, TAG, DISKUSSION UND ENDE. JEDES MAL EIN ZUFÄLLIGER CLIP.",
+        "VOIX LA NUIT, LE JOUR, AU DÉBAT ET À LA FIN. CHAQUE FOIS UN CLIP AU HASARD.",
+        "夜、昼、讨论和结束时旁白。每次随机一条。",
+    )
+    val healerRepeatHint = t(
+        "OFF: HEALER AND BODYGUARD CANNOT PICK THE SAME PERSON TWO NIGHTS IN A ROW. ON: THEY MAY.",
+        "ISKLJUČENO: LEKAR I TELOHRANITELJ NE SMEJU ISTI CILJ DVE NOĆI ZAREDOM. UKLJUČENO: SMEJU.",
+        "OFF: GUARITORE E GUARDIA NON POSSONO SCEGLIERE LA STESSA PERSONA DUE NOTTI DI FILA. ON: POSSONO.",
+        "OFF: SANADOR Y GUARDAESPALDAS NO PUEDEN ELEGIR A LA MISMA PERSONA DOS NOCHES SEGUIDAS. ON: PUEDEN.",
+        "AUS: HEILER UND LEIBWÄCHTER DÜRFEN NICHT ZWEI NÄCHTE DIESELBE PERSON WÄHLEN. AN: DÜRFEN.",
+        "OFF: GUÉRISSEUR ET GARDE NE PEUVENT PAS PRENDRE LA MÊME PERSONNE DEUX NUITS DE SUITE. ON: ILS PEUVENT.",
+        "关：医生和保镖不能连续两夜选同一人。开：可以。",
+    )
+    val firstKillHint = t(
+        "OFF: MAFIA DOES NOT KILL ON NIGHT 1. THEY STILL SEE EACH OTHER AND VOTE IF NEEDED LATER.",
+        "ISKLJUČENO: MAFIJA NE UBIJA PRVE NOĆI. I DALJE SE VIDE. KASNIJE GLASAJU NORMALNO.",
+        "OFF: LA MAFIA NON UCCIDE LA NOTTE 1. SI VEDONO COMUNQUE. POI VOTANO NORMALE.",
+        "OFF: LA MAFIA NO MATA EN LA NOCHE 1. AUN ASÍ SE VEN. LUEGO VOTAN NORMAL.",
+        "AUS: DIE MAFIA TÖTET NICHT IN NACHT 1. SIE SEHEN SICH TROTZDEM. DANACH NORMAL ABSTIMMEN.",
+        "OFF: LA MAFIA NE TUE PAS LA NUIT 1. ELLE SE VOIT QUAND MÊME. ENSUITE VOTE NORMAL.",
+        "关：黑手党第一夜不杀人。仍能互认。之后正常投票。",
+    )
+    val voteCountHint = t(
+        "MAFIA SEE HOW MANY VOTES EACH NAME HAS. THE LAST MAFIA ALSO SEES WHO IS WINNING THE KILL.",
+        "MAFIJA VIDI KOLIKO GLASOVA IMA SVAKO IME. POSLEDNJI MAFIJAŠ VIDI I KO TRENUTNO PADA.",
+        "LA MAFIA VE I VOTI SU OGNI NOME. L'ULTIMO MAFIOSO VE ANCHE CHI STA PER MORIRE.",
+        "LA MAFIA VE CUÁNTOS VOTOS TIENE CADA NOMBRE. EL ÚLTIMO MAFIOSO VE QUIÉN VA A CAER.",
+        "DIE MAFIA SIEHT DIE STIMMEN PRO NAME. DER LETZTE MAFIOSO SIEHT AUCH, WER GERADE STIRBT.",
+        "LA MAFIA VOIT LES VOTES PAR NOM. LE DERNIER MAFIEUX VOIT AUSSI QUI VA TOMBER.",
+        "黑手党能看见每个名字的票数。最后一个黑手党还能看见当前夜杀领先谁。",
+    )
+    val dummyActionHint = t(
+        "WHAT POWERLESS PLAYERS TAP AT NIGHT SO THEY LOOK THE SAME AS POWER ROLES. RANDOM MIXES LIKE AND MATH.",
+        "ŠTA BESPOMOĆNI TAPKAJU NOĆU DA IZGLEDAJU KAO MOĆNE ULOGE. NASUMIČNO MEŠA LAJK I RAČUN.",
+        "COSA TAPPA CHI NON HA POTERE DI NOTTE PER SEMBRARE UN RUOLO FORTE. CASUALE MESCOLA LIKE E MATE.",
+        "LO QUE TOCAN DE NOCHE QUIENES NO TIENEN PODER PARA PARECER UN ROL FUERTE. ALEATORIO MEZCLA LIKE Y MATES.",
+        "WAS MACHTLOSE NACHTS TIPPEN, DAMIT SIE WIE MACHTROLLEN AUSSEHEN. ZUFALL MISCHT LIKE UND RECHNEN.",
+        "CE QUE TAPENT LA NUIT CEUX SANS POUVOIR POUR RESSEMBLER AUX RÔLES FORTS. ALÉATOIRE MÉLANGE LIKE ET MATHS.",
+        "没技能的人夜里点什么，好看起来像有技能。随机会混点赞和算术。",
+    )
+    val discussTimerHint = t(
+        "ALARM WHEN TALK TIME ENDS. OFF = NO CLOCK. HOST STILL HOLDS TO GO TO THE VOTE.",
+        "ALARM KAD ISTEKENE PRIČA. ISKLJUČENO = NEMA SATA. HOST I DALJE DRŽI DA IDE NA GLASANJE.",
+        "ALLARME A FINE DISCUSSIONE. OFF = NESSUN OROLOGIO. L'HOST TIENE COMUNQUE PER ANDARE AL VOTO.",
+        "ALARMA AL ACABAR EL DEBATE. OFF = SIN RELOJ. EL ANFITRIÓN SIGUE MANTENIENDO PARA IR AL VOTO.",
+        "ALARM WENN DIE REDEZEIT ENDET. AUS = KEINE UHR. DER HOST HÄLT TROTZDEM FÜR DIE ABSTIMMUNG.",
+        "ALARME QUAND LE DÉBAT FINIT. OFF = PAS D'HORLOGE. L'HÔTE MAINTIENT QUAND MÊME POUR ALLER AU VOTE.",
+        "讨论结束时闹钟。关=没有计时。房主仍长按进入投票。",
+    )
+    val dayVoteHint = t(
+        "LIVE: THE TABLE VOTES OUT LOUD, HOST TAPS WHO IS OUT. PHONE: THE PHONE GOES AROUND FOR A SECRET VOTE.",
+        "UŽIVO: STO GLASA NAGLAS, HOST KUCNE KO PADA. TELEFON: TELEFON IDE U KRUG ZA TAJNI GLAS.",
+        "DAL VIVO: IL TAVOLO VOTA A VOCE, L'HOST TOCCA CHI ESCE. TELEFONO: IL TELEFONO GIRA PER UN VOTO SEGRETO.",
+        "EN VIVO: LA MESA VOTA EN VOZ ALTA, EL ANFITRIÓN TOCA QUIÉN SALE. TELÉFONO: EL TELÉFONO DA LA VUELTA EN SECRETO.",
+        "LIVE: DER TISCH STIMMT LAUT AB, DER HOST TIPPT WER RAUS IST. HANDY: DAS HANDY GEHT IM KREIS FÜR GEHEIME STIMMEN.",
+        "EN DIRECT: LA TABLE VOTE À VOIX HAUTE, L'HÔTE TOUCHE QUI SORT. TÉLÉPHONE: LE TÉLÉPHONE TOURNE POUR UN VOTE SECRET.",
+        "现场：桌上口头投票，房主点谁出局。手机：手机传一圈秘密投票。",
+    )
+    val revealRoleHint = t(
+        "WHEN SOMEONE DIES, THE SUMMARY SHOWS THEIR ROLE. OFF: ONLY THE NAME AND HOW THEY DIED.",
+        "KAD NEKO UMRE, SAŽETAK POKAŽE ULOGU. ISKLJUČENO: SAMO IME I KAKO JE UMRO.",
+        "QUANDO QUALCUNO MUORE, IL RIEPILOGO MOSTRA IL RUOLO. OFF: SOLO NOME E COME È MORTO.",
+        "CUANDO ALGUIEN MUERE, EL RESUMEN MUESTRA EL ROL. OFF: SOLO NOMBRE Y CÓMO MURIÓ.",
+        "WENN JEMAND STIRBT, ZEIGT DIE ZUSAMMENFASSUNG DIE ROLLE. AUS: NUR NAME UND TODESART.",
+        "QUAND QUELQU'UN MEURT, LE RÉCAP MONTRE LE RÔLE. OFF: SEULEMENT LE NOM ET COMMENT IL EST MORT.",
+        "有人死时，结算显示身份。关：只显示名字和死因。",
+    )
+    val revealEndHint = t(
+        "GAME OVER LISTS EVERY ROLE. OFF: ONLY THE WINNER SIDE, NO FULL REVEAL.",
+        "KRAJ IGRE IZLISTA SVE ULOGE. ISKLJUČENO: SAMO KO JE POBEDIO, BEZ PUNOG OTKRIVANJA.",
+        "A FINE PARTITA ELENCA TUTTI I RUOLI. OFF: SOLO CHI HA VINTO, SENZA REVEAL COMPLETO.",
+        "AL FINAL LISTA TODOS LOS ROLES. OFF: SOLO QUIÉN GANÓ, SIN REVELAR TODO.",
+        "AM ENDE STEHEN ALLE ROLLEN. AUS: NUR DIE SIEGERSEITE, KEIN VOLLES REVEAL.",
+        "À LA FIN TOUS LES RÔLES SONT LISTÉS. OFF: SEULEMENT LE CAMP GAGNANT, PAS DE REVEAL COMPLET.",
+        "结束时列出全部身份。关：只显示胜方，不揭晓所有人。",
+    )
+    val mafiaTalkTimeHint = t(
+        "HOW LONG MAFIA MAY LOOK UP AND NOD BEFORE THEY MUST SLEEP AGAIN. SKIP CUTS THIS SHORT.",
+        "KOLIKO MAFIJA SME DA GLEDA GORE I KLIMA PRE NEGO ŠTO MORA OPET DA SPAVA. PRESKOČI SKRAĆUJE.",
+        "PER QUANTO LA MAFIA PUÒ GUARDARE SU E ANNUUIRE PRIMA DI DORMIRE DI NUOVO. SALTA ACCORCIA.",
+        "CUÁNTO PUEDE LA MAFIA MIRAR ARRIBA Y ASENTIR ANTES DE DORMIR OTRA VEZ. SALTAR LO ACORTA.",
+        "WIE LANGE DIE MAFIA HOCHSCHAUEN UND NICKEN DARF, BEVOR SIE WIEDER SCHLÄFT. ÜBERSPRINGEN KÜRZT DAS.",
+        "COMBIEN DE TEMPS LA MAFIA PEUT LEVER LA TÊTE ET HOCHER AVANT DE DORMIR ENCORE. PASSER RACCOURCIT.",
+        "黑手党抬头点头商量多久，然后必须再睡。跳过会缩短这段。",
+    )
+    val whoreAlignHint = t(
+        "SETS HOW THE WHORE WINS FOR EVERY NEW GAME UNTIL YOU CHANGE IT. PICK = THEY CHOOSE AT THE START OF THAT MATCH.",
+        "POSTAVLJA KAKO KURVA POBEĐUJE U SVAKOJ NOVOJ IGRI DOK NE PROMENIŠ. PICK = BIRAJU NA POČETKU TE PARTIJE.",
+        "IMPOSTA COME VINCE LA PUTTANA IN OGNI NUOVA PARTITA FINCHÉ NON LO CAMBI. PICK = SCELGONO ALL'INIZIO DI QUELLA PARTITA.",
+        "DEFINE CÓMO GANA LA PUTA EN CADA PARTIDA NUEVA HASTA QUE LO CAMBIES. PICK = ELIGEN AL EMPEZAR ESA PARTIDA.",
+        "LEGT FEST, WIE DIE HURE IN JEDER NEUEN PARTIE GEWINNT, BIS DU ES ÄNDERST. PICK = SIE WÄHLEN AM START DIESER PARTIE.",
+        "RÈGLE COMMENT LA PUTAIN GAGNE À CHAQUE NOUVELLE PARTIE JUSQU'À CE QUE TU CHANGES. PICK = ELLES CHOISISSENT AU DÉBUT DE CETTE PARTIE.",
+        "设定妓女每局如何获胜，直到你改掉。PICK = 开局由她们自己选。",
     )
     val sound = t("SOUND", "ZVUK", "SUONO", "SONIDO", "TON", "SON", "声音")
     val vibration = t("VIBRATION", "VIBRACIJA", "VIBRAZIONE", "VIBRACIÓN", "VIBRATION", "VIBRATION", "振动")
@@ -118,6 +253,15 @@ class Str(private val lang: AppLang) {
     val recommended = t("RECOMMENDED FOR", "PREPORUKA ZA", "CONSIGLIATO PER", "RECOMENDADO PARA", "EMPFOHLEN FÜR", "RECOMMANDÉ POUR", "推荐人数")
     val players = t("PLAYERS", "IGRAČA", "GIOCATORI", "JUGADORES", "SPIELER", "JOUEURS", "人")
     val advanced = t("ADVANCED ROLES", "NAPREDNE ULOGE", "RUOLI AVANZATI", "ROLES AVANZADOS", "SPEZIALROLLEN", "RÔLES AVANCÉS", "进阶身份")
+    val advancedHint = t(
+        "UNLOCKED SPECIAL ROLES. EACH CAN ROLL A SPAWN CHANCE. IF IT MISSES, THAT SEAT BECOMES CIVILIAN OR MAFIA.",
+        "OTKLJUČANE SPECIJALNE ULOGE. SVAKA IMA ŠANSU DA SE POJAVI. AKO PROMAŠI, TO MESTO POSTAJE CIVIL ILI MAFIJA.",
+        "RUOLI SPECIALI SBLOCCATI. OGNUNO HA UNA CHANCE DI SPAWN. SE MANCA, QUEL POSTO DIVENTA CIVILE O MAFIA.",
+        "ROLES ESPECIALES DESBLOQUEADOS. CADA UNO TIENE PROBABILIDAD DE SALIR. SI FALLA, ESE ASIENTO PASA A CIVIL O MAFIA.",
+        "FREIGESCHALTETE SPEZIALROLLEN. JEDE HAT EINE SPAWN-CHANCE. BEI MISS WIRD DER PLATZ ZIVILIST ODER MAFIA.",
+        "RÔLES SPÉCIAUX DÉBLOQUÉS. CHACUN A UNE CHANCE D'APPARAÎTRE. SI ÇA RATE, LA PLACE DEVIENT CIVIL OU MAFIA.",
+        "已解锁的特殊身份。每个有出现概率。没出则该位变成平民或黑手党。",
+    )
     val resetRec = t("RESET TO RECOMMENDED", "VRATI PREPORUKU", "RIPRISTINA CONSIGLIO", "RESTAURAR RECOMENDADO", "EMPFEHLUNG ZURÜCK", "REMETTRE LE CONSEIL", "恢复推荐")
     val clearSetup = t("CLEAR SETUP", "OBRIŠI SETUP", "AZZERA SETUP", "BORRAR SETUP", "SETUP LÖSCHEN", "EFFACER LE SETUP", "清空配置")
     val start = t("START GAME", "POKRENI", "INIZIA", "EMPEZAR", "START", "LANCER", "开始")
@@ -341,13 +485,13 @@ class Str(private val lang: AppLang) {
         }
     }
     val unlockHint = t(
-        "EACH SPECIAL COSTS 1. GOOD = WARD. EVIL = STAIN. WILD = JEST. JOKER IS FREE.",
-        "SVAKA SPECIJALNA KOŠTA 1. DOBRE = WARD. ZLE = STAIN. WILD = JEST. DŽOKER JE BESPLATAN.",
-        "OGNI SPECIALE COSTA 1. BUONI = WARD. CATTIVI = STAIN. WILD = JEST. JOKER È GRATIS.",
-        "CADA ESPECIAL CUESTA 1. BIEN = WARD. MAL = STAIN. WILD = JEST. JOKER ES GRATIS.",
-        "JEDE SPEZIALROLLE KOSTET 1. GUTE = WARD. BÖSE = STAIN. WILD = JEST. JOKER IST GRATIS.",
-        "CHAQUE SPÉCIAL COÛTE 1. BONS = WARD. MÉCHANTS = STAIN. WILD = JEST. JOKER EST GRATUIT.",
-        "每个特殊身份花 1。好人 = WARD。坏人 = STAIN。狂野 = JEST。小丑免费。",
+        "PLAY A MATCH AT LEAST 5 MINUTES. GOOD WIN = WARD. MAFIA OR KILLER = STAIN. JOKER OR WHORE = JEST. EACH SPECIAL COSTS 1. JOKER IS FREE.",
+        "ODIGRAJ PARTIJU BAR 5 MINUTA. DOBRI = WARD. MAFIJA ILI UBICA = STAIN. DŽOKER ILI KURVA = JEST. SPECIJALNA KOŠTA 1. DŽOKER JE BESPLATAN.",
+        "GIOCA ALMENO 5 MINUTI. BUONI = WARD. MAFIA O KILLER = STAIN. JOKER O PUTTANA = JEST. UNO SPECIALE COSTA 1. JOKER È GRATIS.",
+        "JUEGA AL MENOS 5 MINUTOS. BIEN = WARD. MAFIA O ASESINO = STAIN. JOKER O PUTA = JEST. CADA ESPECIAL CUESTA 1. JOKER ES GRATIS.",
+        "SPIELE MINDESTENS 5 MINUTEN. GUTE = WARD. MAFIA ODER KILLER = STAIN. JOKER ODER HURE = JEST. SPEZIAL KOSTET 1. JOKER IST GRATIS.",
+        "JOUE AU MOINS 5 MINUTES. BONS = WARD. MAFIA OU TUEUR = STAIN. JOKER OU PUTAIN = JEST. UN SPÉCIAL COÛTE 1. JOKER EST GRATUIT.",
+        "打满 5 分钟。好人赢 = WARD。黑手党或杀手 = STAIN。小丑或妓女 = JEST。特殊身份花 1。小丑免费。",
     )
     fun watchAd(seen: Int, need: Int) =
         t("WATCH AD  $seen/$need", "GLEDAJ AD  $seen/$need", "GUARDA AD  $seen/$need", "VER ANUNCIO  $seen/$need", "WERBUNG  $seen/$need", "PUB  $seen/$need", "看广告  $seen/$need")
@@ -373,6 +517,8 @@ class Str(private val lang: AppLang) {
         "不可能打得这么快。",
     )
     fun matchCoin(n: Int, coin: String) = "+$n $coin"
+    val earnedCoin = t("YOU EARNED", "DOBIO SI", "HAI OTTENUTO", "GANASTE", "DU HAST BEKOMMEN", "TU AS GAGNÉ", "你获得了")
+    val youHave = t("YOU NOW HAVE", "SADA IMAŠ", "ADESSO HAI", "AHORA TIENES", "DU HAST JETZT", "TU AS MAINTENANT", "你现在有")
     val freeRole = t("FREE", "BESPLATNO", "GRATIS", "GRATIS", "GRATIS", "GRATUIT", "免费")
     val unlockedLabel = t("UNLOCKED", "OTKLJUČANO", "SBLOCCATO", "DESBLOQUEADO", "FREIGESCHALTET", "DÉBLOQUÉ", "已解锁")
     val locked = t("LOCKED", "ZAKLJUČANO", "BLOCCATO", "BLOQUEADO", "GESPERRT", "VERROUILLÉ", "未解锁")
@@ -410,32 +556,50 @@ class Str(private val lang: AppLang) {
     val guest = t("GUEST", "GOST", "OSPITE", "INVITADO", "GAST", "INVITÉ", "游客")
     val profile = t("PROFILE", "PROFIL", "PROFILO", "PERFIL", "PROFIL", "PROFIL", "资料")
     val pickAvatar = t(
-        "PICK A FACE. MORE ART LATER.",
-        "IZABERI LICE. SLIKE KASNIJE.",
-        "SCEGLI UNA FACCIA. ALTRE IMMAGINI DOPO.",
-        "ELIGE UNA CARA. MÁS ARTE LUEGO.",
-        "WÄHL EIN GESICHT. MEHR BILDER SPÄTER.",
-        "CHOISIS UN VISAGE. PLUS D'ART PLUS TARD.",
-        "选一张脸。以后再加图。",
+        "PICK A FACE.",
+        "IZABERI LICE.",
+        "SCEGLI UNA FACCIA.",
+        "ELIGE UNA CARA.",
+        "WÄHL EIN GESICHT.",
+        "CHOISIS UN VISAGE.",
+        "选一张脸。",
     )
     val namePlaceholder = t("YOUR NAME", "TVOJE IME", "IL TUO NOME", "TU NOMBRE", "DEIN NAME", "TON NOM", "你的名字")
-    val signInPlay = t("SIGN IN WITH PLAY", "PRIJAVI SE PREKO PLAY", "ACCEDI CON PLAY", "ENTRAR CON PLAY", "MIT PLAY ANMELDEN", "CONNEXION PLAY", "用 Play 登录")
-    val signedIn = t("SIGNED IN  (STUB)", "PRIJAVLJEN  (STUB)", "CONNESSO  (STUB)", "CONECTADO  (STUB)", "ANGEMELDET  (STUB)", "CONNECTÉ  (STUB)", "已登录（占位）")
+    val signInPlay = t("SIGN IN WITH PLAY GAMES", "PRIJAVI SE PREKO PLAY GAMES", "ACCEDI CON PLAY GAMES", "ENTRAR CON PLAY GAMES", "MIT PLAY GAMES ANMELDEN", "CONNEXION PLAY GAMES", "用 Play 游戏登录")
+    val signedIn = t("SIGNED IN", "PRIJAVLJEN", "CONNESSO", "CONECTADO", "ANGEMELDET", "CONNECTÉ", "已登录")
     val savePlay = t("SAVE TO PLAY", "SAČUVAJ NA PLAY", "SALVA SU PLAY", "GUARDAR EN PLAY", "AUF PLAY SPEICHERN", "SAUVER SUR PLAY", "保存到 Play")
     val loadPlay = t("LOAD FROM PLAY", "UČITAJ SA PLAY", "CARICA DA PLAY", "CARGAR DESDE PLAY", "VON PLAY LADEN", "CHARGER DEPUIS PLAY", "从 Play 读取")
-    val playStubHint = t(
-        "PLAY GAMES CLOUD COMES LATER. SAVE / LOAD IS A LOCAL STUB FOR NOW.",
-        "PLAY GAMES CLOUD DOLAZI KASNIJE. SAVE / LOAD JE ZA SADA LOKALNI STUB.",
-        "IL CLOUD PLAY ARRIVA DOPO. SALVA / CARICA È UNO STUB LOCALE.",
-        "LA NUBE DE PLAY LLEGA LUEGO. GUARDAR / CARGAR ES UN STUB LOCAL.",
-        "PLAY-CLOUD KOMMT SPÄTER. SPEICHERN / LADEN IST LOKALER STUB.",
-        "LE CLOUD PLAY VIENT PLUS TARD. SAUVER / CHARGER EST UN STUB LOCAL.",
-        "Play 云存档以后再做。现在保存/读取只是本地占位。",
+    val playHint = t(
+        "NAME AND FACE SAVE ON THIS PHONE. SIGN IN WITH PLAY GAMES TO KEEP COINS IF YOU SWITCH PHONES.",
+        "IME I LICE SE ČUVAJU NA OVOM TELEFONU. PRIJAVI SE NA PLAY GAMES DA NOSEŠ NOVČIĆE NA DRUGI TELEFON.",
+        "NOME E FACCIA RESTANO SU QUESTO TELEFONO. ACCEDI A PLAY GAMES PER PORTARE LE MONETE SU UN ALTRO TELEFONO.",
+        "NOMBRE Y CARA SE GUARDAN EN ESTE TELÉFONO. ENTRA EN PLAY GAMES PARA LLEVAR LAS MONEDAS A OTRO MÓVIL.",
+        "NAME UND GESICHT BLEIBEN AUF DIESEM HANDY. MIT PLAY GAMES ANMELDEN, DAMIT MÜNZEN AUF EIN ANDERES HANDY GEHEN.",
+        "NOM ET VISAGE RESTENT SUR CE TÉLÉPHONE. CONNECTE-TOI À PLAY GAMES POUR GARDER LES PIÈCES SUR UN AUTRE TÉLÉPHONE.",
+        "名字和头像保存在这台手机。登录 Play 游戏后换手机也能带着币。",
+    )
+    val playNotLinked = t(
+        "PLAY GAMES IS NOT LINKED YET. COINS STILL SAVE ON THIS PHONE.",
+        "PLAY GAMES JOŠ NIJE POVEZAN. NOVČIĆI SE I DALJE ČUVAJU NA OVOM TELEFONU.",
+        "PLAY GAMES NON È ANCORA COLLEGATO. LE MONETE RESTANO SU QUESTO TELEFONO.",
+        "PLAY GAMES AÚN NO ESTÁ ENLAZADO. LAS MONEDAS SIGUEN EN ESTE TELÉFONO.",
+        "PLAY GAMES IST NOCH NICHT VERKNÜPFT. MÜNZEN BLEIBEN AUF DIESEM HANDY.",
+        "PLAY GAMES N'EST PAS ENCORE LIÉ. LES PIÈCES RESTENT SUR CE TÉLÉPHONE.",
+        "Play 游戏还没接上。币仍保存在这台手机。",
     )
     val playNeedSignIn = t("SIGN IN FIRST.", "PRVO SE PRIJAVI.", "ACCEDI PRIMA.", "ENTRA PRIMERO.", "ERST ANMELDEN.", "CONNECTE-TOI D'ABORD.", "请先登录。")
     val playSaved = t("SAVED.", "SAČUVANO.", "SALVATO.", "GUARDADO.", "GESPEICHERT.", "SAUVÉ.", "已保存。")
     val playLoaded = t("LOADED.", "UČITANO.", "CARICATO.", "CARGADO.", "GELADEN.", "CHARGÉ.", "已读取。")
     val playEmpty = t("NOTHING SAVED YET.", "NIŠTA JOŠ NIJE SAČUVANO.", "ANCORA NIENTE SALVATO.", "AÚN NO HAY NADA GUARDADO.", "NOCH NICHTS GESPEICHERT.", "RIEN SAUVÉ POUR L'INSTANT.", "还没有存档。")
+    val playSignInFail = t(
+        "COULD NOT SIGN IN. IS PLAY GAMES INSTALLED?",
+        "PRIJAVA NIJE USPELA. JE LI PLAY GAMES INSTALIRAN?",
+        "ACCESSO FALLITO. PLAY GAMES È INSTALLATO?",
+        "NO SE PUDO ENTRAR. ¿ESTÁ PLAY GAMES?",
+        "ANMELDUNG FEHLGESCHLAGEN. IST PLAY GAMES DA?",
+        "CONNEXION ÉCHOUÉE. PLAY GAMES EST LÀ ?",
+        "登录失败。装了 Play 游戏吗？",
+    )
     val statsSoon = t(
         "WINRATE, ROLE HISTORY, EXPORT. COMING SOON.",
         "WINRATE, ISTORIJA ULOGA, EXPORT. USKORO.",
@@ -1021,5 +1185,15 @@ class Str(private val lang: AppLang) {
         "Mafia jagt nachts. Die Stadt wirft sie tags raus. Spezialrollen ändern die Rechnung. Lies die Regeln vor dem ersten Chaos.",
         "La mafia chasse la nuit. Le village les vote le jour. Les rôles avancés changent le calcul. Lis les Règles avant le premier bordel.",
         "黑手党夜里猎杀。好人白天投票放逐。进阶身份改写胜负。开打前先看规则。",
+    )
+    val privacyPolicy = t("PRIVACY POLICY", "POLITIKA PRIVATNOSTI", "PRIVACY", "PRIVACIDAD", "DATENSCHUTZ", "CONFIDENTIALITÉ", "隐私政策")
+    val privacyBody = t(
+        "Secret Mafia is a one-phone party game. On this device we store your display name, chosen face, coins (WARD / STAIN / JEST), unlocked roles, and settings. Nothing is sold. There are no ads in this build. If you sign in with Google Play Games, that same progress can be saved to Google’s Saved Games so it follows your Play Games account to another phone. You can keep playing without signing in; then progress stays only on this phone. Vibration is used for timers and holds. Uninstalling the app deletes the local copy. Questions: use the Play Store listing contact once the app is published.",
+        "Secret Mafia je igra za jedan telefon. Na uređaju čuvamo ime, lice, novčiće (WARD / STAIN / JEST), otključane uloge i podešavanja. Ništa se ne prodaje. U ovoj verziji nema reklama. Ako se prijaviš na Google Play Games, isti napredak može da stoji u Google Saved Games i da ide sa nalogom na drugi telefon. Možeš da igraš i bez prijave; onda ostaje samo ovde. Vibracija je za tajmere i hold. Deinstalacija briše lokalnu kopiju. Pitanja: kontakt sa Play Store stranice kad igra izađe.",
+        "Secret Mafia è un gioco da un telefono. Su questo dispositivo restano nome, faccia, monete (WARD / STAIN / JEST), ruoli sbloccati e impostazioni. Non vendiamo nulla. In questa build non ci sono ads. Se accedi a Google Play Games, lo stesso progresso può stare nei Saved Games di Google e seguirti su un altro telefono. Puoi giocare senza accesso; allora resta solo qui. La vibrazione serve a timer e hold. Disinstallare cancella la copia locale. Domande: contatto della scheda Play Store quando l’app è pubblicata.",
+        "Secret Mafia es un juego de un teléfono. En este aparato guardamos nombre, cara, monedas (WARD / STAIN / JEST), roles desbloqueados y ajustes. No se vende nada. En esta versión no hay anuncios. Si entras en Google Play Games, ese progreso puede ir a Saved Games de Google y seguirte a otro móvil. Puedes jugar sin entrar; entonces solo queda aquí. La vibración es para temporizadores y la pulsación larga. Desinstalar borra la copia local. Preguntas: el contacto de Play Store cuando la app esté publicada.",
+        "Secret Mafia ist ein Ein-Handy-Partyspiel. Auf diesem Gerät speichern wir Anzeigename, Gesicht, Münzen (WARD / STAIN / JEST), freigeschaltete Rollen und Einstellungen. Nichts wird verkauft. In diesem Build gibt es keine Werbung. Wenn du dich bei Google Play Games anmeldest, kann derselbe Fortschritt in Googles Saved Games liegen und mit dem Konto auf ein anderes Handy. Ohne Anmeldung bleibt alles nur hier. Vibration für Timer und Halten. Deinstallieren löscht die lokale Kopie. Fragen: Play-Store-Kontakt, sobald die App live ist.",
+        "Secret Mafia est un jeu à un téléphone. Sur cet appareil on garde le nom, le visage, les pièces (WARD / STAIN / JEST), les rôles débloqués et les réglages. Rien n’est vendu. Pas de pub dans cette version. Si tu te connectes à Google Play Games, le même progrès peut aller dans les Saved Games Google et te suivre sur un autre téléphone. Sans connexion, ça reste ici. La vibration sert aux minuteurs et au maintien. Désinstaller efface la copie locale. Questions : contact de la fiche Play Store une fois l’app publiée.",
+        "Secret Mafia 是一部手机的聚会游戏。本机保存显示名、头像、代币（WARD / STAIN / JEST）、已解锁身份和设置。不出售数据。本版没有广告。若登录 Google Play 游戏，同一进度可写入谷歌云存档并随账号换机。不登录也能玩，进度只留在这台手机。振动用于计时和长按。卸载会删除本地副本。问题：上架后用 Play 商店页的联系方式。",
     )
 }
