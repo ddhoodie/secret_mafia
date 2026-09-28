@@ -1,6 +1,7 @@
 package com.secretmafia.ui.screens
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.secretmafia.ui.components.BrandLogo
 import com.secretmafia.ui.components.PixelButton
@@ -24,7 +25,7 @@ fun ComingSoonScreen(title: String, body: String, onBack: () -> Unit) {
 }
 
 @Composable
-fun AboutScreen(onBack: () -> Unit) {
+fun AboutScreen(onPrivacy: () -> Unit, onBack: () -> Unit) {
     val s = str()
     PixelScreen(scroll = true) {
         PixelText(s.about, size = 28, bold = true)
@@ -39,6 +40,20 @@ fun AboutScreen(onBack: () -> Unit) {
         PixelText(s.about2, size = 16)
         VSpace(16.dp)
         PixelText(s.about3, size = 16)
+        VSpace(28.dp)
+        PixelButton(s.privacyPolicy, onClick = onPrivacy)
+        VSpace(12.dp)
+        PixelButton(s.back, onClick = onBack)
+    }
+}
+
+@Composable
+fun PrivacyScreen(onBack: () -> Unit) {
+    val s = str()
+    PixelScreen(scroll = true) {
+        PixelText(s.privacyPolicy, size = 24, bold = true)
+        VSpace(16.dp)
+        PixelText(s.privacyBody, size = 14, align = TextAlign.Start)
         VSpace(28.dp)
         PixelButton(s.back, onClick = onBack)
     }
