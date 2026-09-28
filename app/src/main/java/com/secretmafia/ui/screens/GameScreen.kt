@@ -32,18 +32,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.secretmafia.game.ActionAnimation
-import com.secretmafia.game.CoinKind
 import com.secretmafia.game.DeathRecord
 import com.secretmafia.game.DummyActionType
 import com.secretmafia.game.GamePhase
 import com.secretmafia.game.GameRules
 import com.secretmafia.game.GameState
 import com.secretmafia.game.GameViewModel
-import com.secretmafia.game.MatchReward
 import com.secretmafia.game.NightActionResult
 import com.secretmafia.game.PassKind
 import com.secretmafia.game.Player
-import com.secretmafia.game.Progress
 import com.secretmafia.game.Role
 import com.secretmafia.game.Wallet
 import com.secretmafia.game.WhoreAlign
@@ -51,8 +48,8 @@ import com.secretmafia.game.Winner
 import com.secretmafia.ui.Feedback
 import com.secretmafia.ui.Narrator
 import com.secretmafia.ui.NarratorLine
-import com.secretmafia.ui.components.CoinLine
 import com.secretmafia.ui.components.DrainBar
+import com.secretmafia.ui.components.MatchPayout
 import com.secretmafia.ui.components.GameBar
 import com.secretmafia.ui.components.HoldUnlock
 import com.secretmafia.ui.components.PixelButton
@@ -864,19 +861,6 @@ private fun GameOverPane(
             VSpace(6.dp)
         }
         VSpace(28.dp)
-        when (val reward = state.matchReward) {
-            MatchReward.TOO_FAST -> PixelText(s.tooFast, size = 15, color = c.accent)
-            MatchReward.BLOOD, MatchReward.TOWN, MatchReward.GOLD -> {
-                val kind = Progress.coinFrom(reward)!!
-                PixelText(s.matchCoin(Progress.MATCH_REWARD, s.coinName(kind)), size = 15)
-            }
-            null -> Unit
-        }
-        if (state.survivorLived) {
-            VSpace(8.dp)
-            PixelText(s.survivorBonus(s.coinName(CoinKind.GOLD)), size = 15)
-        }
-        VSpace(10.dp)
-        CoinLine(wallet)
+        MatchPayout(state.matchReward, state.survivorLived, wallet)
     }
 }

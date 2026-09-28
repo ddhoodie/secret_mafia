@@ -44,39 +44,16 @@ private val wildRoles = listOf(
 @Composable
 fun RolesCatalogScreen(
     wallet: Wallet,
-    adWatches: Int,
     onRole: (Role) -> Unit,
-    onWatchAd: () -> Unit,
-    onPickAdCoin: (CoinKind) -> Unit,
     onBack: () -> Unit,
 ) {
     val s = str()
-    val c = pal()
-    val pickReady = Progress.adPickReady(adWatches)
     PixelScreen(scroll = true) {
         PixelText(s.roles, size = 28, bold = true)
         VSpace(8.dp)
         CoinLine(wallet)
         VSpace(6.dp)
         PixelText(s.unlockHint, size = 13)
-        VSpace(8.dp)
-        PixelText(s.adCoinHint, size = 13, color = c.muted)
-        VSpace(12.dp)
-        if (pickReady) {
-            PixelText(s.pickAdCoin, size = 16, bold = true)
-            VSpace(10.dp)
-            listOf(CoinKind.TOWN, CoinKind.BLOOD, CoinKind.GOLD).forEach { kind ->
-                PixelButton(
-                    label = s.takeCoin(s.coinName(kind)),
-                    tint = coinTint(kind),
-                ) { onPickAdCoin(kind) }
-                VSpace(8.dp)
-            }
-        } else {
-            PixelButton(s.watchAd(adWatches, Progress.ADS_FOR_COIN)) {
-                onWatchAd()
-            }
-        }
         VSpace(18.dp)
         PixelText(s.goodRoles, size = 16, bold = true)
         VSpace(10.dp)
@@ -128,6 +105,8 @@ fun RoleUnlockDetail(
             PixelText(s.whoreHow, size = 14, bold = true)
             VSpace(10.dp)
             PixelButton(s.whoreAlignLabel(whoreAlign), onClick = onCycleWhoreAlign)
+            VSpace(8.dp)
+            PixelText(s.whoreAlignHint, size = 13, color = pal().muted, align = TextAlign.Start)
         }
         VSpace(28.dp)
         if (!role.isFree && !owned) {

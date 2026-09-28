@@ -1,25 +1,32 @@
 package com.secretmafia.ui.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.secretmafia.game.CoinKind
+import com.secretmafia.game.MatchReward
 import com.secretmafia.game.Progress
 import com.secretmafia.game.Wallet
 import com.secretmafia.ui.theme.Blood
@@ -93,9 +100,60 @@ fun CoinLine(wallet: Wallet, size: Int = 13) {
     }
 }
 
+@Composable
+fun MatchPayout(
+    reward: MatchReward?,
+    survivorLived: Boolean,
+    wallet: Wallet,
+) {
+    val s = str()
+    val c = pal()
+    val kinds = buildList {
+        Progress.coinFrom(reward ?: MatchReward.TOO_FAST)?.let(::add)
+        if (survivorLived) add(CoinKind.GOLD)
+    }
+    val pop = remember { Animatable(0.25f) }
+    LaunchedEffect(reward, survivorLived) {
+        pop.snapTo(0.25f)
+        pop.animateTo(1.18f, tween(480, easing = FastOutSlowInEasing))
+        pop.animateTo(1f, tween(180))
+    }
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        when (reward) {
+            MatchReward.TOO_FAST, null -> PixelText(s.tooFast, size = 15, color = c.accent)
+            MatchReward.BLOOD, MatchReward.TOWN, MatchReward.GOLD -> {
+                val kind = Progress.coinFrom(reward)!!
+                PixelText(s.earnedCoin, size = 13, color = c.muted)
+                VSpace(8.dp)
+                PixelText(s.matchCoin(Progress.MATCH_REWARD, s.coinName(kind)), size = 22, bold = true)
+            }
+        }
+        if (survivorLived) {
+            VSpace(8.dp)
+            PixelText(s.survivorBonus(s.coinName(CoinKind.GOLD)), size = 15)
+        }
+        if (kinds.isNotEmpty()) {
+            VSpace(16.dp)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.graphicsLayer {
+                    scaleX = pop.value
+                    scaleY = pop.value
+                },
+            ) {
+                kinds.forEach { CoinIcon(it, size = 52.dp) }
+            }
+        }
+        VSpace(18.dp)
+        PixelText(s.youHave, size = 13, color = c.muted)
+        VSpace(8.dp)
+        CoinLine(wallet, size = 15)
+    }
+}
+
 /**
- * Preset avatars only. Drop `res/drawable/avatar_0.png` … `avatar_5.png` later.
- * Until then, a numbered bust placeholder.
+ * Preset faces in `res/drawable/avatar_0.png` … `avatar_7.png`.
  */
 @Composable
 fun AvatarPortrait(avatarId: Int, size: Dp = 56.dp) {

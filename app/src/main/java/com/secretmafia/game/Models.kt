@@ -136,7 +136,8 @@ data class RoleCounts(val amounts: Map<Role, Int> = emptyMap()) {
         var next = this
         Role.entries.filter { !it.core }.forEach { role ->
             if (!owns(role) && next[role] > 0) {
-                next = next.with(role, 0)
+                val dumped = next[role]
+                next = next.with(role, 0).with(Role.CIVILIAN, next[Role.CIVILIAN] + dumped)
             }
         }
         return next
