@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.secretmafia.game.Profile
+import com.secretmafia.game.Progress
 import com.secretmafia.ui.components.AvatarPortrait
 import com.secretmafia.ui.components.PixelButton
 import com.secretmafia.ui.components.PixelScreen
@@ -31,6 +32,7 @@ import com.secretmafia.ui.theme.str
 fun ProfileScreen(
     profile: Profile,
     status: String,
+    playReady: Boolean,
     onName: (String) -> Unit,
     onAvatar: (Int) -> Unit,
     onSignIn: () -> Unit,
@@ -43,18 +45,18 @@ fun ProfileScreen(
     PixelScreen(scroll = true) {
         PixelText(s.profile, size = 28, bold = true)
         VSpace(8.dp)
-        PixelText(s.playStubHint, size = 13, color = c.muted)
+        PixelText(s.playHint, size = 13, color = c.muted)
         VSpace(16.dp)
         AvatarPortrait(profile.avatarId, size = 88.dp)
         VSpace(12.dp)
         PixelText(s.pickAvatar, size = 13)
         VSpace(8.dp)
-        listOf(0..2, 3..5).forEach { range ->
+        (0 until Progress.AVATAR_COUNT).chunked(4).forEach { row ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                range.forEach { i ->
+                row.forEach { i ->
                     val selected = profile.avatarId == i
                     Box(
                         modifier = Modifier
@@ -96,14 +98,19 @@ fun ProfileScreen(
             },
         )
         VSpace(16.dp)
-        PixelButton(
-            if (profile.playSignedIn) s.signedIn else s.signInPlay,
-            onClick = onSignIn,
-        )
-        VSpace(8.dp)
-        PixelButton(s.savePlay, enabled = profile.playSignedIn, onClick = onSave)
-        VSpace(8.dp)
-        PixelButton(s.loadPlay, enabled = profile.playSignedIn, onClick = onLoad)
+        if (profile.playSignedIn) {
+            PixelText(s.signedIn, size = 14, color = c.muted)
+            VSpace(8.dp)
+            PixelButton(s.savePlay, onClick = onSave)
+            VSpace(8.dp)
+            PixelButton(s.loadPlay, onClick = onLoad)
+        } else {
+            PixelButton(s.signInPlay, enabled = playReady, onClick = onSignIn)
+            if (!playReady) {
+                VSpace(8.dp)
+                PixelText(s.playNotLinked, size = 13, color = c.muted)
+            }
+        }
         if (status.isNotEmpty()) {
             VSpace(10.dp)
             PixelText(status, size = 13, color = c.muted)
