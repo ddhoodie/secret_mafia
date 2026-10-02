@@ -11,5 +11,7 @@
 *.apk
 *.ap_
 *.aab
+*.jks
+keystore.properties
 .kotlin
 context.md
