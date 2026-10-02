@@ -146,13 +146,13 @@ class Str(private val lang: AppLang) {
         "没技能的人夜里点什么，好看起来像有技能。随机会混点赞和算术。",
     )
     val discussTimerHint = t(
-        "ALARM WHEN TALK TIME ENDS. OFF = NO CLOCK. HOST STILL HOLDS TO GO TO THE VOTE.",
-        "ALARM KAD ISTEKENE PRIČA. ISKLJUČENO = NEMA SATA. HOST I DALJE DRŽI DA IDE NA GLASANJE.",
-        "ALLARME A FINE DISCUSSIONE. OFF = NESSUN OROLOGIO. L'HOST TIENE COMUNQUE PER ANDARE AL VOTO.",
-        "ALARMA AL ACABAR EL DEBATE. OFF = SIN RELOJ. EL ANFITRIÓN SIGUE MANTENIENDO PARA IR AL VOTO.",
-        "ALARM WENN DIE REDEZEIT ENDET. AUS = KEINE UHR. DER HOST HÄLT TROTZDEM FÜR DIE ABSTIMMUNG.",
-        "ALARME QUAND LE DÉBAT FINIT. OFF = PAS D'HORLOGE. L'HÔTE MAINTIENT QUAND MÊME POUR ALLER AU VOTE.",
-        "讨论结束时闹钟。关=没有计时。房主仍长按进入投票。",
+        "MINUS TURNS THE CLOCK OFF. PLUS ADDS ONE MINUTE, UP TO 30. AT ZERO THE PHONE ALARMS. THE HOST STILL HOLDS TO START THE VOTE.",
+        "MINUS GASI SAT. PLUS DODAJE JEDAN MINUT, DO 30. NA NULI TELEFON ALARMIRA. HOST I DALJE DRŽI DA POČNE GLASANJE.",
+        "MENO SPEGNE L'OROLOGIO. PIÙ AGGIUNGE UN MINUTO, FINO A 30. A ZERO IL TELEFONO SUONA. L'HOST TIENE COMUNQUE PER INIZIARE IL VOTO.",
+        "MENOS APAGA EL RELOJ. MÁS SUMA UN MINUTO, HASTA 30. EN CERO EL TELÉFONO ALARMA. EL ANFITRIÓN SIGUE MANTENIENDO PARA EMPEZAR EL VOTO.",
+        "MINUS SCHALTET DIE UHR AUS. PLUS FÜGT EINE MINUTE HINZU, BIS 30. BEI NULL ALARMIERT DAS HANDY. DER HOST HÄLT TROTZDEM, UM ABZUSTIMMEN.",
+        "MOINS COUPE L'HORLOGE. PLUS AJOUTE UNE MINUTE, JUSQU'À 30. À ZÉRO LE TÉLÉPHONE SONNE. L'HÔTE MAINTIENT QUAND MÊME POUR LANCER LE VOTE.",
+        "减号关闭计时。加号每次加一分钟，最多 30。到零时手机响铃。房主仍长按开始投票。",
     )
     val dayVoteHint = t(
         "LIVE: THE TABLE VOTES OUT LOUD, HOST TAPS WHO IS OUT. PHONE: THE PHONE GOES AROUND FOR A SECRET VOTE.",
@@ -1124,40 +1124,236 @@ class Str(private val lang: AppLang) {
     }
 
     val generalBody = t(
-        "One phone hosts the game. Sit in the order you type names. Pass the phone around each night. Unlock only when it is your turn. After night: summary, discuss, then a day vote. Live vote = the table decides and the host taps who is out. Phone vote = pass again.",
-        "Jedan telefon vodi igru. Sedite redom kako upisujete imena. Telefon ide u krug svake noći. Otključaj samo na svom redu. Posle noći: rezime, diskusija, pa dnevno glasanje. Uživo = sto odluči, host tapne ko ispada. Telefon = opet se predaje.",
-        "Un telefono ospita la partita. Sedete nell'ordine dei nomi. Ogni notte il telefono gira. Sblocca solo al tuo turno. Dopo la notte: riepilogo, discussione, voto diurno. Dal vivo = il tavolo decide, l'host tocca chi esce. Telefono = si passa di nuovo.",
-        "Un teléfono lleva la partida. Sentaos en el orden de los nombres. Cada noche el teléfono da la vuelta. Desbloquea solo en tu turno. Tras la noche: resumen, debate, voto diurno. En vivo = la mesa decide, el anfitrión toca quién sale. Teléfono = se pasa otra vez.",
-        "Ein Handy führt das Spiel. Sitzt in der Reihenfolge der Namen. Jede Nacht wandert das Handy. Nur in deinem Zug entsperren. Nach der Nacht: Zusammenfassung, Diskussion, Tagesabstimmung. Live = der Tisch entscheidet, der Host tippt wer raus ist. Handy = wieder herumgeben.",
-        "Un téléphone mène la partie. Asseyez-vous dans l'ordre des noms. Chaque nuit le téléphone tourne. Déverrouille seulement à ton tour. Après la nuit : résumé, débat, vote du jour. En direct = la table décide, l'hôte tape qui sort. Téléphone = on repasse.",
-        "一部手机主持对局。按输入名字的顺序坐。每晚传手机。只在自己回合解锁。夜晚之后：结算、讨论、白天投票。现场投票 = 牌桌决定，房主点谁出局。手机投票 = 再传一圈。",
+        "One phone runs the whole game. You sit around a table. Nobody has to sit out as a narrator.\n\n" +
+            "1. Type every name, in the order people are sitting. The phone visits players in that order.\n" +
+            "2. Choose how many are good and how many are evil. The app suggests a fair split. Most people are good. A few are evil.\n" +
+            "3. Night. The phone goes around. Only the person whose turn it is looks. They hold to unlock, see which side they are on, do one action, then pass the phone. Do not say what you did.\n" +
+            "4. Morning. The phone says who died, if anyone.\n" +
+            "5. Day. Talk out loud. Try to find the evil players. They will lie.\n" +
+            "6. Vote someone out, or nobody.\n" +
+            "7. Repeat until one side wins.\n\n" +
+            "You only know your own side. Good wants to vote the evil out. Evil wants to kill the good at night and survive the votes.\n\n" +
+            "Some players, if you add them, play alone. They are neither good nor evil.\n\n" +
+            "You can change how the night and the day work in Settings, under Gameplay.",
+        "Jedan telefon vodi celu igru. Sedite oko stola. Niko ne mora da sedi kao voditelj.\n\n" +
+            "1. Upiši svako ime, redom kako ljudi sede. Telefon posećuje igrače tim redom.\n" +
+            "2. Izaberi koliko je dobrih, a koliko zlih. Aplikacija predlaže fer raspodelu. Većina je dobra. Nekoliko je zlo.\n" +
+            "3. Noć. Telefon ide u krug. Gleda samo onaj na koga je red. Drži da otključa, vidi na kojoj je strani, uradi jednu akciju, pa preda telefon. Ne govori šta si uradio.\n" +
+            "4. Jutro. Telefon kaže ko je umro, ako je iko.\n" +
+            "5. Dan. Pričajte naglas. Pokušajte da nađete zle. Oni će lagati.\n" +
+            "6. Izbacite nekoga, ili nikoga.\n" +
+            "7. Ponavljajte dok jedna strana ne pobedi.\n\n" +
+            "Znaš samo svoju stranu. Dobri hoće da izglasaju zle. Zli hoće da noću ubiju dobre i da prežive glasanja.\n\n" +
+            "Neki igrači, ako ih dodaš, igraju sami. Nisu ni dobri ni zli.\n\n" +
+            "Noć i dan možeš da promeniš u Podešavanjima, pod Gejmplej.",
+        "Un telefono conduce tutta la partita. Siete seduti intorno a un tavolo. Nessuno deve restare fuori come narratore.\n\n" +
+            "1. Scrivi ogni nome, nell'ordine in cui siete seduti. Il telefono visita i giocatori in quell'ordine.\n" +
+            "2. Scegli quanti sono buoni e quanti sono cattivi. L'app propone una divisione equa. La maggior parte è buona. Pochi sono cattivi.\n" +
+            "3. Notte. Il telefono gira. Guarda solo chi è di turno. Tiene premuto per sbloccare, vede da che parte sta, fa un'azione, poi passa il telefono. Non dire cosa hai fatto.\n" +
+            "4. Mattina. Il telefono dice chi è morto, se qualcuno.\n" +
+            "5. Giorno. Parlate ad alta voce. Cercate i cattivi. Loro mentiranno.\n" +
+            "6. Esiliate qualcuno, o nessuno.\n" +
+            "7. Ripetete finché un lato vince.\n\n" +
+            "Conosci solo la tua parte. I buoni vogliono votare fuori i cattivi. I cattivi vogliono uccidere i buoni di notte e sopravvivere ai voti.\n\n" +
+            "Alcuni giocatori, se li aggiungi, giocano da soli. Non sono né buoni né cattivi.\n\n" +
+            "Puoi cambiare come funzionano la notte e il giorno in Impostazioni, sotto Gioco.",
+        "Un teléfono lleva toda la partida. Os sentáis alrededor de una mesa. Nadie tiene que quedarse de narrador.\n\n" +
+            "1. Escribe cada nombre, en el orden en que estáis sentados. El teléfono visita a los jugadores en ese orden.\n" +
+            "2. Elige cuántos son buenos y cuántos son malos. La app sugiere un reparto justo. La mayoría es buena. Unos pocos son malos.\n" +
+            "3. Noche. El teléfono da la vuelta. Solo mira quien tiene el turno. Mantiene pulsado para abrir, ve de qué lado está, hace una acción y pasa el teléfono. No digas lo que hiciste.\n" +
+            "4. Mañana. El teléfono dice quién murió, si alguien.\n" +
+            "5. Día. Hablad en voz alta. Intentad encontrar a los malos. Van a mentir.\n" +
+            "6. Expulsad a alguien, o a nadie.\n" +
+            "7. Repetid hasta que gane un bando.\n\n" +
+            "Solo conoces tu bando. Los buenos quieren votar fuera a los malos. Los malos quieren matar a los buenos de noche y sobrevivir a las votaciones.\n\n" +
+            "Algunos jugadores, si los añades, juegan solos. No son ni buenos ni malos.\n\n" +
+            "Puedes cambiar cómo funcionan la noche y el día en Ajustes, en Juego.",
+        "Ein Handy führt das ganze Spiel. Ihr sitzt um einen Tisch. Niemand muss als Erzähler draußen sitzen.\n\n" +
+            "1. Trag jeden Namen ein, in der Sitzreihenfolge. Das Handy besucht die Spieler in dieser Reihenfolge.\n" +
+            "2. Wähl, wie viele gut und wie viele böse sind. Die App schlägt eine faire Aufteilung vor. Die meisten sind gut. Ein paar sind böse.\n" +
+            "3. Nacht. Das Handy wandert herum. Nur die Person, die dran ist, schaut. Sie hält zum Entsperren, sieht auf welcher Seite sie steht, macht eine Aktion und gibt das Handy weiter. Sag nicht, was du getan hast.\n" +
+            "4. Morgen. Das Handy sagt, wer gestorben ist, falls jemand.\n" +
+            "5. Tag. Redet laut. Versucht, die Bösen zu finden. Sie werden lügen.\n" +
+            "6. Werft jemanden raus, oder niemanden.\n" +
+            "7. Wiederholt, bis eine Seite gewinnt.\n\n" +
+            "Du kennst nur deine eigene Seite. Die Guten wollen die Bösen rauswählen. Die Bösen wollen die Guten nachts töten und die Abstimmungen überleben.\n\n" +
+            "Manche Spieler, falls du sie hinzufügst, spielen allein. Sie sind weder gut noch böse.\n\n" +
+            "Du kannst ändern, wie Nacht und Tag laufen, unter Einstellungen, Spielablauf.",
+        "Un téléphone mène toute la partie. Vous êtes assis autour d'une table. Personne n'a à rester narrateur.\n\n" +
+            "1. Écris chaque nom, dans l'ordre des places. Le téléphone visite les joueurs dans cet ordre.\n" +
+            "2. Choisis combien sont bons et combien sont mauvais. L'app propose un partage juste. La plupart sont bons. Quelques-uns sont mauvais.\n" +
+            "3. Nuit. Le téléphone tourne. Seule la personne dont c'est le tour regarde. Elle maintient pour déverrouiller, voit de quel côté elle est, fait une action, puis passe le téléphone. Ne dis pas ce que tu as fait.\n" +
+            "4. Matin. Le téléphone dit qui est mort, s'il y a quelqu'un.\n" +
+            "5. Jour. Parlez à voix haute. Essayez de trouver les mauvais. Ils vont mentir.\n" +
+            "6. Exilez quelqu'un, ou personne.\n" +
+            "7. Répétez jusqu'à ce qu'un camp gagne.\n\n" +
+            "Tu ne connais que ton camp. Les bons veulent voter les mauvais dehors. Les mauvais veulent tuer les bons la nuit et survivre aux votes.\n\n" +
+            "Certains joueurs, si tu les ajoutes, jouent seuls. Ils ne sont ni bons ni mauvais.\n\n" +
+            "Tu peux changer le déroulement de la nuit et du jour dans Réglages, sous Gameplay.",
+        "一部手机主持整局。大家围桌而坐。不用有人当旁白。\n\n" +
+            "1. 按座位顺序输入每个名字。手机按这个顺序传。\n" +
+            "2. 选择多少好人、多少坏人。应用会建议一个公平分配。大多数是好人。少数是坏人。\n" +
+            "3. 夜晚。手机传一圈。只有轮到的人看屏幕。长按解锁，看到自己站哪一边，做一个行动，再把手机传下去。不要说出你做了什么。\n" +
+            "4. 早晨。手机宣布谁死了（如果有人死）。\n" +
+            "5. 白天。出声讨论。找出坏人。他们会撒谎。\n" +
+            "6. 放逐一个人，或者谁也不放逐。\n" +
+            "7. 重复，直到一方获胜。\n\n" +
+            "你只知道自己的阵营。好人想投票赶走坏人。坏人想在夜里杀掉好人，并在投票中活下来。\n\n" +
+            "如果加上某些玩家，他们独自玩。他们既不是好人，也不是坏人。\n\n" +
+            "夜晚和白天怎么进行，可以在设置的玩法里改。",
     )
     val nightBody = t(
-        "Everyone living gets the phone. Power roles act in secret. Others do a dummy tap so nobody can tell who has a power. Then the night resolves: mafia votes, healer can save, bodyguard can take the hit, killer may strike on even nights.",
-        "Svaki živi dobije telefon. Moćne uloge rade tajno. Ostali tapnu lažnu akciju da se ne vidi ko ima moć. Noć se rešava: mafija glasa, lekar može da spasi, telohranitelj može da primi udarac, ubica udara na parnim noćima.",
-        "Ogni vivo prende il telefono. I ruoli con potere agiscono in segreto. Gli altri fanno un tap finto così non si capisce chi ha il potere. Poi la notte si risolve: la mafia vota, il guaritore può salvare, la guardia può prendere il colpo, il killer colpisce nelle notti pari.",
-        "Cada vivo recibe el teléfono. Los roles con poder actúan en secreto. Los demás tocan una acción falsa para que no se vea quién tiene poder. Luego se resuelve la noche: la mafia vota, el sanador puede salvar, el guardaespaldas puede recibir el golpe, el asesino pega en noches pares.",
-        "Jeder Lebende bekommt das Handy. Machtrollen handeln geheim. Die anderen tippen eine Scheinaktion, damit niemand sieht, wer Macht hat. Dann löst sich die Nacht: Mafia stimmt, Heiler kann retten, Leibwächter kann den Schlag nehmen, Killer schlägt in geraden Nächten.",
-        "Chaque vivant a le téléphone. Les rôles à pouvoir agissent en secret. Les autres tapent une fausse action pour qu'on ne voie pas qui a un pouvoir. Puis la nuit se résout : la mafia vote, le guérisseur peut sauver, le garde peut prendre le coup, le tueur frappe les nuits paires.",
-        "每个活着的人都拿到手机。有技能的身份偷偷行动。其他人点伪装，让人看不出谁有技能。然后结算夜晚：黑手党投票，医生可救人，保镖可挡刀，杀手在双数夜动手。",
+        "Night is when the secret actions happen. The phone visits every living player, in seating order. Dead players are skipped.\n\n" +
+            "When it is your turn:\n" +
+            "• Nobody else looks at the screen.\n" +
+            "• Hold to unlock.\n" +
+            "• You see your side and one choice.\n" +
+            "• Do it, lock the phone, and pass it on. Stay quiet about what you picked.\n\n" +
+            "Evil players secretly choose who dies. Their choices are added together. The name with the most votes dies. If they split evenly, one of the tied names is chosen. Evil players can see each other.\n\n" +
+            "A good player may have a secret action, or none. Players with nothing to do still tap the screen, so the table cannot tell who has a real action from how long they hold the phone.\n\n" +
+            "Then the night ends. The morning screen lists who died. It does not say who did it.\n\n" +
+            "Night options are in Settings, under Gameplay, Round.",
+        "Noć je vreme tajnih akcija. Telefon ide kod svakog živog igrača, redom sedenja. Mrtvi se preskaču.\n\n" +
+            "Kad si na redu:\n" +
+            "• Niko drugi ne gleda ekran.\n" +
+            "• Drži da otključaš.\n" +
+            "• Vidiš svoju stranu i jedan izbor.\n" +
+            "• Uradi to, zaključaj telefon i predaj ga. Ne pričaj šta si izabrao.\n\n" +
+            "Zli tajno biraju ko umire. Izbori se sabiraju. Ime sa najviše glasova umire. Ako je nerešeno, bira se jedno od izjednačenih imena. Zli vide jedni druge.\n\n" +
+            "Dobar igrač može da ima tajnu akciju, ili nikakvu. Ko nema šta da radi ipak tapne ekran, da se po dužini držanja ne vidi ko ima pravu akciju.\n\n" +
+            "Onda se noć završava. Jutarnji ekran kaže ko je umro. Ne kaže ko je to uradio.\n\n" +
+            "Opcije noći su u Podešavanjima, pod Gejmplej, Runda.",
+        "La notte è il momento delle azioni segrete. Il telefono visita ogni giocatore vivo, nell'ordine dei posti. I morti si saltano.\n\n" +
+            "Quando è il tuo turno:\n" +
+            "• Nessun altro guarda lo schermo.\n" +
+            "• Tieni premuto per sbloccare.\n" +
+            "• Vedi la tua parte e una scelta.\n" +
+            "• Falla, blocca il telefono e passalo. Non dire cosa hai scelto.\n\n" +
+            "I cattivi scelgono in segreto chi muore. Le scelte si sommano. Muore il nome con più voti. Se è pari, si sceglie uno dei nomi in parità. I cattivi si vedono tra loro.\n\n" +
+            "Un buono può avere un'azione segreta, oppure nessuna. Chi non ha nulla da fare tocca comunque lo schermo, così non si capisce chi ha un'azione vera da quanto tiene il telefono.\n\n" +
+            "Poi la notte finisce. La schermata del mattino elenca chi è morto. Non dice chi è stato.\n\n" +
+            "Le opzioni della notte sono in Impostazioni, sotto Gioco, Round.",
+        "La noche es cuando ocurren las acciones secretas. El teléfono visita a cada jugador vivo, en el orden de los asientos. Los muertos se saltan.\n\n" +
+            "Cuando es tu turno:\n" +
+            "• Nadie más mira la pantalla.\n" +
+            "• Mantén pulsado para abrir.\n" +
+            "• Ves tu bando y una elección.\n" +
+            "• Hazla, bloquea el teléfono y pásalo. No digas lo que elegiste.\n\n" +
+            "Los malos eligen en secreto quién muere. Las elecciones se suman. Muere el nombre con más votos. Si hay empate, se elige uno de los empatados. Los malos se ven entre ellos.\n\n" +
+            "Un bueno puede tener una acción secreta, o ninguna. Quien no tiene nada que hacer igual toca la pantalla, para que nadie adivine quién tiene una acción real por cuánto sostiene el teléfono.\n\n" +
+            "Luego termina la noche. La pantalla de la mañana lista quién murió. No dice quién lo hizo.\n\n" +
+            "Las opciones de la noche están en Ajustes, Juego, Ronda.",
+        "Die Nacht ist die Zeit der geheimen Aktionen. Das Handy besucht jeden lebenden Spieler in Sitzreihenfolge. Tote werden übersprungen.\n\n" +
+            "Wenn du dran bist:\n" +
+            "• Niemand sonst schaut auf den Bildschirm.\n" +
+            "• Halten zum Entsperren.\n" +
+            "• Du siehst deine Seite und eine Wahl.\n" +
+            "• Mach sie, sperre das Handy und gib es weiter. Sag nicht, wen du gewählt hast.\n\n" +
+            "Böse wählen geheim, wer stirbt. Die Wahlen werden zusammengezählt. Der Name mit den meisten Stimmen stirbt. Bei Gleichstand wird einer der Namen gewählt. Böse sehen einander.\n\n" +
+            "Ein Guter kann eine geheime Aktion haben, oder keine. Wer nichts zu tun hat, tippt trotzdem auf den Bildschirm, damit niemand an der Dauer sieht, wer eine echte Aktion hat.\n\n" +
+            "Dann endet die Nacht. Der Morgenbildschirm nennt, wer gestorben ist. Er sagt nicht, wer es war.\n\n" +
+            "Nacht-Optionen sind unter Einstellungen, Spielablauf, Runde.",
+        "La nuit, ce sont les actions secrètes. Le téléphone visite chaque joueur vivant, dans l'ordre des places. Les morts sont sautés.\n\n" +
+            "Quand c'est ton tour :\n" +
+            "• Personne d'autre ne regarde l'écran.\n" +
+            "• Maintiens pour déverrouiller.\n" +
+            "• Tu vois ton camp et un choix.\n" +
+            "• Fais-le, verrouille le téléphone et passe-le. Ne dis pas ce que tu as choisi.\n\n" +
+            "Les mauvais choisissent en secret qui meurt. Les choix s'additionnent. Le nom avec le plus de votes meurt. En cas d'égalité, un des noms à égalité est choisi. Les mauvais se voient entre eux.\n\n" +
+            "Un bon peut avoir une action secrète, ou aucune. Ceux qui n'ont rien à faire tapent quand même l'écran, pour qu'on ne devine pas qui a une vraie action au temps passé sur le téléphone.\n\n" +
+            "Puis la nuit se termine. L'écran du matin liste qui est mort. Il ne dit pas qui l'a fait.\n\n" +
+            "Les options de nuit sont dans Réglages, Gameplay, Manche.",
+        "夜晚是秘密行动的时间。手机按座位顺序传给每个活着的人。死者跳过。\n\n" +
+            "轮到你时：\n" +
+            "• 别人不许看屏幕。\n" +
+            "• 长按解锁。\n" +
+            "• 你看到自己的阵营和一个选择。\n" +
+            "• 做完，锁屏，把手机传下去。不要说出你选了谁。\n\n" +
+            "坏人秘密选择谁死。选择相加。票最多的名字死去。平票时从平票的名字里选一个。坏人能看见彼此。\n\n" +
+            "好人可能有一个秘密行动，也可能没有。没事做的人仍要点屏幕，这样别人不能从拿手机的时间看出谁有真行动。\n\n" +
+            "然后夜晚结束。早晨屏幕列出谁死了，不说是谁干的。\n\n" +
+            "夜晚选项在设置、玩法、回合里。",
     )
     val dayBody = t(
-        "Talk freely. Then vote someone out, or nobody. A tie on the phone vote saves everyone. The lawyer can block one mafia exile. The hunter, if they just died, still picks one last target.",
-        "Pričajte slobodno. Onda izbacite nekoga, ili nikoga. Nerešeno na telefonu = niko ne ispada. Advokat može jednom da blokira izbacivanje mafije. Lovac, ako je upravo umro, bira još jednu metu.",
-        "Parlate pure. Poi esiliate qualcuno, o nessuno. Pareggio sul telefono = nessuno esce. L'avvocato può bloccare un esilio mafioso. Il cacciatore, se è appena morto, sceglie ancora un bersaglio.",
-        "Hablad libremente. Luego expulsad a alguien, o a nadie. Empate en el teléfono = nadie sale. El abogado puede bloquear un exilio mafioso. El cazador, si acaba de morir, elige un último objetivo.",
-        "Redet frei. Dann werft jemanden raus, oder niemanden. Gleichstand am Handy = niemand fliegt. Der Anwalt kann einen Mafia-Rauswurf blocken. Der Jäger, falls er gerade starb, wählt noch ein Ziel.",
-        "Parlez librement. Puis exilez quelqu'un, ou personne. Égalité au téléphone = personne ne sort. L'avocat peut bloquer un exil mafieux. Le chasseur, s'il vient de mourir, choisit encore une cible.",
-        "随便聊。然后放逐一个人，或不放逐。手机投票平票则无人出局。律师可挡一次黑手党放逐。猎人刚死也能再点一个目标。",
+        "Day is when you talk, then vote someone out.\n\n" +
+            "1. Discuss. Say what you noticed, who you trust, who you suspect. You may lie. Evil players will lie too. There is an optional clock in Settings. Minus turns it off. Plus adds one minute. When it hits zero the phone alarms, but you still choose when the vote starts. The host holds the screen to go to the vote.\n" +
+            "2. Vote. Two ways, chosen in Settings:\n" +
+            "• Live: you decide out loud. The host taps the name the table agreed on, or Nobody.\n" +
+            "• Phone: the phone goes around again. Each living player secretly taps who to exile. The name with the most votes is out. A tie means nobody is exiled.\n" +
+            "3. Then night starts again. Dead players do not get the phone.\n\n" +
+            "By default a death shows the name and how they died, not which side they were on. You can show the side in Settings, under Gameplay, Day.",
+        "Dan je kad pričate, pa izbacite nekoga.\n\n" +
+            "1. Diskusija. Recite šta ste primetili, kome verujete, koga sumnjate. Smete da lažete. Zli će takođe lagati. Sat je opcioni, u Podešavanjima. Minus ga gasi. Plus dodaje jedan minut. Na nuli telefon alarmira, ali vi birate kad glasanje počinje. Host drži ekran da ide na glasanje.\n" +
+            "2. Glasanje. Dva načina, biraju se u Podešavanjima:\n" +
+            "• Uživo: odlučite naglas. Host tapne ime na kom se sto složio, ili Niko.\n" +
+            "• Telefon: telefon opet ide u krug. Svaki živi igrač tajno tapne koga da izbaci. Ime sa najviše glasova ispada. Nerešeno znači da niko ne ispada.\n" +
+            "3. Onda opet počinje noć. Mrtvi ne dobijaju telefon.\n\n" +
+            "Podrazumevano smrt pokazuje ime i kako je umro, ne na kojoj je strani bio. Stranu možeš da prikažeš u Podešavanjima, Gejmplej, Dan.",
+        "Il giorno è quando parlate, poi esiliate qualcuno.\n\n" +
+            "1. Discussione. Dite cosa avete notato, di chi vi fidate, chi sospettate. Potete mentire. Anche i cattivi mentiranno. C'è un orologio facoltativo nelle Impostazioni. Meno lo spegne. Più aggiunge un minuto. A zero il telefono suona, ma voi scegliete quando inizia il voto. L'host tiene premuto per andare al voto.\n" +
+            "2. Voto. Due modi, scelti nelle Impostazioni:\n" +
+            "• Dal vivo: decidete a voce. L'host tocca il nome su cui il tavolo è d'accordo, o Nessuno.\n" +
+            "• Telefono: il telefono gira di nuovo. Ogni vivo tocca in segreto chi esiliare. Esce il nome con più voti. Un pareggio vuol dire che non esce nessuno.\n" +
+            "3. Poi ricomincia la notte. I morti non ricevono il telefono.\n\n" +
+            "Di base una morte mostra il nome e come è morto, non da che parte stava. Puoi mostrare la parte in Impostazioni, Gioco, Giorno.",
+        "El día es cuando habláis y luego expulsáis a alguien.\n\n" +
+            "1. Debate. Decid lo que notasteis, en quién confiáis, a quién sospecháis. Podéis mentir. Los malos también mentirán. Hay un reloj opcional en Ajustes. Menos lo apaga. Más suma un minuto. En cero el teléfono alarma, pero vosotros elegís cuándo empieza el voto. El anfitrión mantiene pulsado para ir al voto.\n" +
+            "2. Voto. Dos formas, elegidas en Ajustes:\n" +
+            "• En vivo: decidís en voz alta. El anfitrión toca el nombre acordado, o Nadie.\n" +
+            "• Teléfono: el teléfono da otra vuelta. Cada vivo toca en secreto a quién expulsar. Sale el nombre con más votos. Un empate significa que no sale nadie.\n" +
+            "3. Luego empieza otra noche. Los muertos no reciben el teléfono.\n\n" +
+            "Por defecto una muerte muestra el nombre y cómo murió, no de qué lado estaba. Puedes mostrar el bando en Ajustes, Juego, Día.",
+        "Der Tag ist, wenn ihr redet und dann jemanden rauswerft.\n\n" +
+            "1. Diskussion. Sagt, was euch aufgefallen ist, wem ihr traut, wen ihr verdächtigt. Ihr dürft lügen. Die Bösen lügen auch. Es gibt eine optionale Uhr in den Einstellungen. Minus schaltet sie aus. Plus fügt eine Minute hinzu. Bei null alarmiert das Handy, aber ihr entscheidet, wann die Abstimmung beginnt. Der Host hält, um zur Abstimmung zu gehen.\n" +
+            "2. Abstimmung. Zwei Arten, gewählt in den Einstellungen:\n" +
+            "• Live: ihr entscheidet laut. Der Host tippt den Namen, auf den sich der Tisch geeinigt hat, oder Niemand.\n" +
+            "• Handy: das Handy geht noch einmal herum. Jeder Lebende tippt geheim, wen ihr rauswerft. Der Name mit den meisten Stimmen fliegt. Gleichstand heißt, niemand fliegt.\n" +
+            "3. Dann beginnt wieder die Nacht. Tote bekommen das Handy nicht.\n\n" +
+            "Standardmäßig zeigt ein Tod den Namen und wie die Person starb, nicht auf welcher Seite sie stand. Die Seite zeigst du unter Einstellungen, Spielablauf, Tag.",
+        "Le jour, vous parlez, puis vous exilez quelqu'un.\n\n" +
+            "1. Débat. Dites ce que vous avez remarqué, à qui vous faites confiance, qui vous soupçonnez. Vous pouvez mentir. Les mauvais mentiront aussi. Il y a une horloge facultative dans les Réglages. Moins la coupe. Plus ajoute une minute. À zéro le téléphone sonne, mais vous choisissez quand le vote commence. L'hôte maintient pour aller au vote.\n" +
+            "2. Vote. Deux façons, choisies dans les Réglages :\n" +
+            "• En direct : vous décidez à voix haute. L'hôte touche le nom choisi par la table, ou Personne.\n" +
+            "• Téléphone : le téléphone refait le tour. Chaque vivant touche en secret qui exiler. Le nom avec le plus de votes sort. Une égalité veut dire que personne ne sort.\n" +
+            "3. Puis la nuit recommence. Les morts ne reçoivent pas le téléphone.\n\n" +
+            "Par défaut une mort montre le nom et comment la personne est morte, pas de quel côté elle était. Tu peux montrer le camp dans Réglages, Gameplay, Jour.",
+        "白天是讨论，然后放逐一个人。\n\n" +
+            "1. 讨论。说出你注意到的事、你信任谁、你怀疑谁。可以撒谎。坏人也会撒谎。设置里有可选计时。减号关闭。加号加一分钟。到零时手机响铃，但你们自己决定何时开始投票。房主长按进入投票。\n" +
+            "2. 投票。两种方式，在设置里选：\n" +
+            "• 现场：大声决定。房主点桌上同意的名字，或无人。\n" +
+            "• 手机：手机再传一圈。每个活着的人秘密点要放逐谁。票最多的名字出局。平票则无人出局。\n" +
+            "3. 然后再次入夜。死者不再拿到手机。\n\n" +
+            "默认死亡只显示名字和死因，不显示阵营。可以在设置、玩法、白天里打开显示阵营。",
     )
     val winBody = t(
-        "Mafia wins if living evil is greater or equal to living good. Neutrals do not count in that race. Good wins when no evil remain and the killer is gone. Joker wins only if day-exiled. Killer wins if they are the last player alive. A solo whore wins at 1v1. A pest whore never wins. A living survivor does not block the win — they just pocket extra JEST.",
-        "Mafija pobeđuje ako je živih zlih više ili jednako živim dobrima. Neutralni se ne broje. Dobri pobeđuju kad nema zlih i kad nema ubice. Džoker pobeđuje samo ako ispadne danju. Ubica pobeđuje ako ostane poslednji. Kurva sama pobedi na 1v1. Smeta nikad ne pobedi. Živi preživeli ne blokira pobedu — samo uzme extra JEST.",
-        "La mafia vince se i cattivi vivi sono maggiori o uguali ai buoni. I neutrali non contano. I buoni vincono quando non restano cattivi e il killer è fuori. Lo Joker vince solo se esiliato di giorno. Il killer vince se resta l'ultimo. La puttana sola vince all'1v1. Chi solo disturba non vince mai. Un survivor vivo non blocca la vittoria — intasca solo JEST extra.",
-        "La mafia gana si el mal vivo es mayor o igual que el bien. Los neutrales no cuentan. El bien gana cuando no queda mal y el asesino no está. El joker gana solo si lo exilian de día. El asesino gana si es el último vivo. La puta sola gana en 1v1. Quien solo molesta nunca gana. Un superviviente vivo no bloquea la victoria: solo se lleva JEST extra.",
-        "Mafia gewinnt, wenn lebende Böse größer oder gleich lebenden Guten sind. Neutrale zählen nicht. Die Guten gewinnen, wenn kein Böses mehr da ist und der Killer weg ist. Der Joker gewinnt nur bei Tagesrauswurf. Der Killer gewinnt als letzter Lebender. Eine allein spielende Hure gewinnt im 1v1. Eine bloße Störerin gewinnt nie. Ein lebender Survivor blockt den Sieg nicht — er kassiert nur extra JEST.",
-        "La mafia gagne si le mal vivant est supérieur ou égal au bien. Les neutres ne comptent pas. Les bons gagnent quand il n'y a plus de mal et plus de tueur. Le joker gagne seulement s'il est exilé le jour. Le tueur gagne s'il est le dernier vivant. Une putain solo gagne en 1v1. Une gêneuse ne gagne jamais. Un survivant vivant ne bloque pas la victoire — il empoche juste du JEST extra.",
-        "活着的坏人不少于好人时，黑手党赢。中立不计入。没有坏人且杀手已死，好人赢。小丑只有白天被放逐才赢。杀手最后一个活着就赢。独自妓女 1v1 获胜。只捣乱的妓女永不赢。活着的幸存者不挡别人赢，只多拿一份 JEST。",
+        "After each night and after each day vote, the phone checks if the game is over.\n\n" +
+            "Good wins when every evil player is dead.\n\n" +
+            "Evil wins when living evil is at least as many as living good. Example: 2 evil and 2 good left means evil wins.\n\n" +
+            "Some players play alone. They are not good and not evil, and they are not counted on either side. They do not stop good or evil from winning. If you added any, how that player wins is written on their own page under Roles.",
+        "Posle svake noći i posle svakog dnevnog glasanja telefon proverava da li je igra gotova.\n\n" +
+            "Dobri pobeđuju kad su svi zli mrtvi.\n\n" +
+            "Zli pobeđuju kad je živih zlih bar koliko i živih dobrih. Primer: ostala 2 zla i 2 dobra znači da zli pobeđuju.\n\n" +
+            "Neki igrači igraju sami. Nisu ni dobri ni zli i ne broje se ni na jednoj strani. Ne sprečavaju pobedu dobrih ni zlih. Ako si nekog dodao, kako taj igrač pobeđuje piše na njegovoj stranici, pod Uloge.",
+        "Dopo ogni notte e dopo ogni voto diurno il telefono controlla se la partita è finita.\n\n" +
+            "I buoni vincono quando ogni cattivo è morto.\n\n" +
+            "I cattivi vincono quando i cattivi vivi sono almeno quanti i buoni vivi. Esempio: restano 2 cattivi e 2 buoni, vincono i cattivi.\n\n" +
+            "Alcuni giocatori giocano da soli. Non sono né buoni né cattivi e non contano da nessuna parte. Non impediscono la vittoria dei buoni né dei cattivi. Se ne hai aggiunto uno, come vince sta sulla sua pagina, sotto Ruoli.",
+        "Después de cada noche y de cada voto diurno el teléfono comprueba si la partida terminó.\n\n" +
+            "Los buenos ganan cuando todo el mal está muerto.\n\n" +
+            "Los malos ganan cuando el mal vivo es al menos tantos como el bien vivo. Ejemplo: quedan 2 malos y 2 buenos, ganan los malos.\n\n" +
+            "Algunos jugadores juegan solos. No son ni buenos ni malos y no cuentan en ningún lado. No impiden que ganen los buenos ni los malos. Si añadiste alguno, cómo gana ese jugador está en su página, en Roles.",
+        "Nach jeder Nacht und nach jeder Tagesabstimmung prüft das Handy, ob das Spiel vorbei ist.\n\n" +
+            "Die Guten gewinnen, wenn jeder Böse tot ist.\n\n" +
+            "Die Bösen gewinnen, wenn lebende Böse mindestens so viele sind wie lebende Gute. Beispiel: 2 Böse und 2 Gute übrig heißt, die Bösen gewinnen.\n\n" +
+            "Manche Spieler spielen allein. Sie sind weder gut noch böse und zählen auf keiner Seite. Sie verhindern den Sieg der Guten oder der Bösen nicht. Falls du welche hinzugefügt hast, steht auf ihrer eigenen Seite unter Rollen, wie sie gewinnen.",
+        "Après chaque nuit et après chaque vote du jour, le téléphone vérifie si la partie est finie.\n\n" +
+            "Les bons gagnent quand tous les mauvais sont morts.\n\n" +
+            "Les mauvais gagnent quand le mal vivant est au moins aussi nombreux que le bien vivant. Exemple : 2 mauvais et 2 bons restants, les mauvais gagnent.\n\n" +
+            "Certains joueurs jouent seuls. Ils ne sont ni bons ni mauvais et ne comptent d'aucun côté. Ils n'empêchent ni les bons ni les mauvais de gagner. Si tu en as ajouté, comment ce joueur gagne est écrit sur sa page, sous Rôles.",
+        "每个夜晚之后、每次白天投票之后，手机会检查游戏是否结束。\n\n" +
+            "好人获胜：所有坏人都死了。\n\n" +
+            "坏人获胜：活着的坏人数不少于活着的好人数。例如：剩下 2 个坏人、2 个好人，坏人赢。\n\n" +
+            "有些玩家独自玩。他们既不是好人，也不是坏人，两边都不计入。不阻止好人获胜，也不阻止坏人获胜。如果加了这样的人，他怎么赢写在角色页他自己的那一页上。",
     )
     val about1 = t(
         "One phone hosts a live mafia game so nobody has to sit out as narrator.",

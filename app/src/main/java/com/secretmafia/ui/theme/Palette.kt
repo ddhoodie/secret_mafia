@@ -14,6 +14,7 @@ data class Palette(
     val muted: Color,
     val accent: Color,
     val heal: Color,
+    val cop: Color,
     val press: Color,
     val holdFill: Color,
 )
@@ -28,6 +29,7 @@ fun buildPalette(light: Boolean, hideGameColors: Boolean, inGame: Boolean): Pale
         muted = if (light) Color(0xFF555555) else Color(0xFFBBBBBB),
         accent = if (hide) fg else Blood,
         heal = if (hide) fg else Heal,
+        cop = if (hide) fg else TownBlue,
         press = if (light) Color(0x11000000) else Color(0x22FFFFFF),
         holdFill = if (light) Color(0x22000000) else Color(0x22FFFFFF),
     )

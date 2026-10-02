@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -285,6 +286,8 @@ fun Stepper(
     min: Int = 0,
     max: Int = 16,
     step: Int = 1,
+    valueText: String? = null,
+    hint: String? = null,
     onChange: (Int) -> Unit,
 ) {
     val c = pal()
@@ -298,11 +301,16 @@ fun Stepper(
     ) {
         PixelText(label, size = 16, bold = true, align = TextAlign.Start, modifier = Modifier.weight(1f))
         MiniBtn("-") { if (value > min) onChange((value - step).coerceAtLeast(min)) }
-        Box(Modifier.width(36.dp), contentAlignment = Alignment.Center) {
-            PixelText(value.toString(), size = 20, bold = true)
+        Box(Modifier.widthIn(min = 48.dp), contentAlignment = Alignment.Center) {
+            PixelText(valueText ?: value.toString(), size = 16, bold = true)
         }
         MiniBtn("+") { if (value < max) onChange((value + step).coerceAtMost(max)) }
     }
+    if (!hint.isNullOrBlank()) {
+        Spacer(Modifier.height(6.dp))
+        PixelText(hint, size = 13, color = c.muted, align = TextAlign.Start, modifier = Modifier.fillMaxWidth())
+    }
+    Spacer(Modifier.height(10.dp))
 }
 
 @Composable

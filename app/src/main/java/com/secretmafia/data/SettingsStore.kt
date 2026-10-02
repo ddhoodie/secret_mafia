@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.secretmafia.BuildConfig
 import com.secretmafia.game.AppLang
 import com.secretmafia.game.AppSettings
 import com.secretmafia.game.CoinKind
@@ -54,6 +53,8 @@ class SettingsStore(private val context: Context) {
     private val profileName = stringPreferencesKey("profile_name")
     private val avatarId = intPreferencesKey("avatar_id")
     private val playSignedIn = booleanPreferencesKey("play_signed_in")
+    private val dummyRandomSet = booleanPreferencesKey("dummy_random_v1")
+    private val starterApplied = booleanPreferencesKey("starter_pack_v1")
     private val playerNamesKey = stringPreferencesKey("player_names")
     private val setupCountsKey = stringPreferencesKey("setup_counts")
     private val setupAdvancedKey = booleanPreferencesKey("setup_advanced")
@@ -76,7 +77,31 @@ class SettingsStore(private val context: Context) {
 
     suspend fun sealWalletIfNeeded() {
         context.dataStore.edit { p ->
-            p.writeWallet(p.toWallet())
+            var wallet = p.toWallet()
+            if (p[starterApplied] != true) {
+                val debugStack = wallet.blood == Progress.DEBUG_START_STACK &&
+                    wallet.town == Progress.DEBUG_START_STACK &&
+                    wallet.gold == Progress.DEBUG_START_STACK
+                wallet = if (debugStack) {
+                    wallet.copy(
+                        blood = Progress.START_BLOOD,
+                        town = Progress.START_TOWN,
+                        gold = Progress.START_GOLD,
+                    )
+                } else {
+                    wallet.copy(
+                        blood = maxOf(wallet.blood, Progress.START_BLOOD),
+                        town = maxOf(wallet.town, Progress.START_TOWN),
+                        gold = maxOf(wallet.gold, Progress.START_GOLD),
+                    )
+                }
+                p[starterApplied] = true
+            }
+            if (p[dummyRandomSet] != true) {
+                p[dummy] = DummyActionType.RANDOM.name
+                p[dummyRandomSet] = true
+            }
+            p.writeWallet(wallet)
         }
     }
 
@@ -189,8 +214,8 @@ class SettingsStore(private val context: Context) {
             showMafiaVoteCount = p[showVote] ?: true,
             discussTimerMinutes = p[discussMins] ?: 0,
             dummyActionType = runCatching {
-                DummyActionType.valueOf(p[dummy] ?: DummyActionType.LIKE.name)
-            }.getOrDefault(DummyActionType.LIKE),
+                DummyActionType.valueOf(p[dummy] ?: DummyActionType.RANDOM.name)
+            }.getOrDefault(DummyActionType.RANDOM),
             revealRoleOnDeath = p[revealRole] ?: false,
             firstNightKill = p[firstKill] ?: true,
             healerMayRepeatTarget = p[healerRepeat] ?: false,
@@ -218,11 +243,13 @@ class SettingsStore(private val context: Context) {
         val sealed = this[walletBlob]
         if (sealed != null) return WalletGuard.open(sealed, deviceId()) ?: Wallet()
         val names = this[unlockedRoles].orEmpty()
-        val fallback = if (BuildConfig.DEBUG) Progress.DEBUG_START_STACK else 0
+        val fallbackBlood = Progress.START_BLOOD
+        val fallbackTown = Progress.START_TOWN
+        val fallbackGold = Progress.START_GOLD
         return Wallet(
-            blood = this[blood] ?: fallback,
-            town = this[town] ?: fallback,
-            gold = this[gold] ?: fallback,
+            blood = this[blood] ?: fallbackBlood,
+            town = this[town] ?: fallbackTown,
+            gold = this[gold] ?: fallbackGold,
             unlocked = names.split(",")
                 .mapNotNull { runCatching { Role.valueOf(it) }.getOrNull() }
                 .toSet(),

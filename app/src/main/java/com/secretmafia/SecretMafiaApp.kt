@@ -1,7 +1,14 @@
 package com.secretmafia
 
+import android.graphics.drawable.ColorDrawable
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +35,7 @@ import com.secretmafia.game.Role
 import com.secretmafia.game.RoleChances
 import com.secretmafia.game.RoleCounts
 import com.secretmafia.game.Wallet
+import com.secretmafia.ui.components.BootSplash
 import com.secretmafia.ui.screens.AboutScreen
 import com.secretmafia.ui.screens.AnimDebugScreen
 import com.secretmafia.ui.screens.ComingSoonScreen
@@ -40,7 +48,6 @@ import com.secretmafia.ui.screens.GameScreen
 import com.secretmafia.ui.screens.GameplayDayScreen
 import com.secretmafia.ui.screens.GameplayHub
 import com.secretmafia.ui.screens.GameplayNightScreen
-import com.secretmafia.ui.screens.GameplayRolesScreen
 import com.secretmafia.ui.screens.MenuScreen
 import com.secretmafia.ui.screens.RulesHub
 import com.secretmafia.ui.screens.RulesRoleDetail
@@ -50,6 +57,7 @@ import com.secretmafia.ui.screens.SettingsHub
 import com.secretmafia.ui.screens.SetupScreen
 import com.secretmafia.ui.theme.ProvideAppStyle
 import com.secretmafia.ui.theme.SecretMafiaTheme
+import com.secretmafia.ui.theme.pal
 import com.secretmafia.ui.theme.str
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -69,6 +77,7 @@ fun SecretMafiaApp(
     var setupRevision by remember { mutableStateOf(0) }
     val game by gameVm.state.collectAsStateWithLifecycle()
     val nav = rememberNavController()
+    var booting by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
     val activity = LocalContext.current as ComponentActivity
     val playCloud = (activity.application as MafiaApp).playCloud
@@ -117,7 +126,12 @@ fun SecretMafiaApp(
 
     SecretMafiaTheme {
         ProvideAppStyle(settings) {
-            NavHost(navController = nav, startDestination = "menu") {
+            val screen = pal().bg
+            SideEffect {
+                activity.window.setBackgroundDrawable(ColorDrawable(screen.toArgb()))
+            }
+            Box(Modifier.fillMaxSize().background(screen)) {
+            NavHost(navController = nav, startDestination = "menu", modifier = Modifier.fillMaxSize()) {
                 composable("menu") {
                     MenuScreen(
                         wallet = wallet,
@@ -146,14 +160,10 @@ fun SecretMafiaApp(
                 }
                 composable("settings/gameplay") {
                     GameplayHub(
-                        onRoles = { nav.navigate("settings/gameplay/roles") },
                         onNight = { nav.navigate("settings/gameplay/night") },
                         onDay = { nav.navigate("settings/gameplay/day") },
                         onBack = { nav.popBackStack() },
                     )
-                }
-                composable("settings/gameplay/roles") {
-                    GameplayRolesScreen(settings, save) { nav.popBackStack() }
                 }
                 composable("settings/gameplay/night") {
                     GameplayNightScreen(settings, save) { nav.popBackStack() }
@@ -230,6 +240,10 @@ fun SecretMafiaApp(
                             whoreAlign = settings.whoreAlign,
                             onCycleWhoreAlign = {
                                 save(settings.copy(whoreAlign = settings.whoreAlign.next()))
+                            },
+                            mayRepeatTarget = settings.healerMayRepeatTarget,
+                            onToggleRepeatTarget = {
+                                save(settings.copy(healerMayRepeatTarget = !settings.healerMayRepeatTarget))
                             },
                             onUnlock = { scope.launch { store.unlockRole(role) } },
                             onBack = { nav.popBackStack() },
@@ -372,6 +386,8 @@ fun SecretMafiaApp(
                         )
                     }
                 }
+            }
+            if (booting) BootSplash { booting = false }
             }
         }
     }

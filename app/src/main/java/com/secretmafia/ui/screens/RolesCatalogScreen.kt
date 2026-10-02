@@ -77,6 +77,8 @@ fun RoleUnlockDetail(
     wallet: Wallet,
     whoreAlign: WhoreAlign = WhoreAlign.PICK,
     onCycleWhoreAlign: () -> Unit = {},
+    mayRepeatTarget: Boolean = false,
+    onToggleRepeatTarget: () -> Unit = {},
     onUnlock: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -107,6 +109,14 @@ fun RoleUnlockDetail(
             PixelButton(s.whoreAlignLabel(whoreAlign), onClick = onCycleWhoreAlign)
             VSpace(8.dp)
             PixelText(s.whoreAlignHint, size = 13, color = pal().muted, align = TextAlign.Start)
+        }
+        if (role == Role.HEALER || role == Role.BODYGUARD) {
+            VSpace(20.dp)
+            PixelText(s.healerRepeat, size = 14, bold = true)
+            VSpace(10.dp)
+            PixelButton(if (mayRepeatTarget) s.on else s.off, onClick = onToggleRepeatTarget)
+            VSpace(8.dp)
+            PixelText(s.healerRepeatHint, size = 13, color = pal().muted, align = TextAlign.Start)
         }
         VSpace(28.dp)
         if (!role.isFree && !owned) {

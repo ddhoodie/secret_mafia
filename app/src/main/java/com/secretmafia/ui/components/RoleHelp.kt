@@ -17,15 +17,15 @@ import com.secretmafia.game.Team
 import com.secretmafia.ui.theme.str
 
 @Composable
-fun RoleHelpButton(role: Role) {
+fun RoleHelpButton(role: Role, female: Boolean? = null) {
     var open by remember { mutableStateOf(false) }
     val s = str()
     PixelButton(s.moreInfo) { open = true }
-    if (open) RoleHelpDialog(role) { open = false }
+    if (open) RoleHelpDialog(role, female) { open = false }
 }
 
 @Composable
-fun RoleHelpDialog(role: Role, onClose: () -> Unit) {
+fun RoleHelpDialog(role: Role, female: Boolean? = null, onClose: () -> Unit) {
     val s = str()
     Dialog(
         onDismissRequest = onClose,
@@ -33,7 +33,7 @@ fun RoleHelpDialog(role: Role, onClose: () -> Unit) {
     ) {
         Box(Modifier.fillMaxSize()) {
             PixelScreen(scroll = true) {
-                RolePortrait(role, size = 120.dp)
+                RolePortrait(role, size = 120.dp, female = female)
                 VSpace(14.dp)
                 PixelText(s.roleTitle(role), size = 28, bold = true)
                 VSpace(6.dp)

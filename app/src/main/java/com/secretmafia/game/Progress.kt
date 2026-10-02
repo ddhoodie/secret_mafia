@@ -11,6 +11,9 @@ object Progress {
     const val MATCH_REWARD = 1
     const val MATCH_MIN_MS = 5 * 60 * 1000L
     const val DEBUG_START_STACK = 100
+    const val START_BLOOD = 2
+    const val START_TOWN = 2
+    const val START_GOLD = 1
     const val AVATAR_COUNT = 8
 
     /** Temporary. Flip true when AdMob rewarded is hooked up. */

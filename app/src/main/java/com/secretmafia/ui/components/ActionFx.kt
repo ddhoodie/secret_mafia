@@ -62,6 +62,28 @@ private data class Bit(
 )
 
 @Composable
+fun roleInk(role: Role?): Color {
+    val c = pal()
+    if (role == null || c.accent == c.fg) return c.fg
+    return when (role) {
+        Role.CIVILIAN, Role.TWIN_CIVIL -> c.fg
+        Role.HEALER, Role.LAWYER -> c.heal
+        Role.COP, Role.MAYOR -> c.cop
+        Role.BODYGUARD -> ShieldBlue
+        Role.SEER, Role.AMNESIAC -> SeerPurple
+        Role.JOKER -> Gold
+        Role.DRUNK -> DrunkGreen
+        Role.WHORE -> WhorePurple
+        Role.LUNATIC -> SeerPink
+        Role.CURSED -> CursedPurpleLite
+        Role.SURVIVOR -> SurviveOrange
+        Role.NECROMANCER -> NecroGreen
+        Role.MAFIA, Role.DON, Role.TWIN_MAFIA, Role.HUNTER, Role.KILLER,
+        Role.VIGILANTE, Role.FRAMER, Role.POISONER, Role.TRAITOR -> c.accent
+    }
+}
+
+@Composable
 fun RoleReveal(action: NightActionResult, s: Str) {
     val c = pal()
     val hide = c.accent == c.fg

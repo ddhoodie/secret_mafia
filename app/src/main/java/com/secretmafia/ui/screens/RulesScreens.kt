@@ -45,7 +45,7 @@ fun RulesTextScreen(title: String, body: String, onBack: () -> Unit) {
     PixelScreen(scroll = true) {
         PixelText(title, size = 28, bold = true)
         VSpace(20.dp)
-        PixelText(body, size = 16)
+        PixelText(body, size = 16, align = TextAlign.Start)
         VSpace(28.dp)
         PixelButton(s.back, onClick = onBack)
     }

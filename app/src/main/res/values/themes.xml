@@ -2,8 +2,11 @@
     <style name="Theme.SecretMafia" parent="android:Theme.Material.NoActionBar">
         <item name="android:statusBarColor">#000000</item>
         <item name="android:navigationBarColor">#000000</item>
-        <item name="android:windowBackground">#000000</item>
+        <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="android:colorPrimary">#000000</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowSplashScreenBackground">@color/black</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/black</item>
     </style>
 </resources>

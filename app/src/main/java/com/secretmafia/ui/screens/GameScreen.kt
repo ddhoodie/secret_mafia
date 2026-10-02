@@ -56,8 +56,8 @@ import com.secretmafia.ui.components.PixelButton
 import com.secretmafia.ui.components.PixelScreen
 import com.secretmafia.ui.components.PixelText
 import com.secretmafia.ui.components.RoleHelpButton
-import com.secretmafia.ui.components.RolePortrait
 import com.secretmafia.ui.components.RoleReveal
+import com.secretmafia.ui.components.roleInk
 import com.secretmafia.ui.components.VSpace
 import com.secretmafia.ui.i18n.Str
 import com.secretmafia.ui.theme.ProvideAppStyle
@@ -319,8 +319,8 @@ private fun ActionPane(vm: GameViewModel, state: GameState, phase: GamePhase.Act
             state.framerPicking -> FramePane(vm, state, actor)
             actor.role == Role.WHORE -> WhoreSleepPane(vm, state, actor)
             actor.role?.isMafiaVoter == true -> MafiaAction(vm, state, actor)
-            actor.role == Role.HEALER -> ProtectAction(vm, state, actor, s.roleTitle(Role.HEALER), pal().heal)
-            actor.role == Role.BODYGUARD -> ProtectAction(vm, state, actor, s.roleTitle(Role.BODYGUARD), pal().fg)
+            actor.role == Role.HEALER -> ProtectAction(vm, state, actor, s.roleTitle(Role.HEALER), roleInk(Role.HEALER))
+            actor.role == Role.BODYGUARD -> ProtectAction(vm, state, actor, s.roleTitle(Role.BODYGUARD), roleInk(Role.BODYGUARD))
             actor.role == Role.COP -> PickList(
                 s.roleTitle(Role.COP), actor.name, s.whoInspect, vm.nightTargets(actor),
                 role = Role.COP,
@@ -341,20 +341,20 @@ private fun ActionPane(vm: GameViewModel, state: GameState, phase: GamePhase.Act
             ) { vm.submitNightTarget(it) }
             actor.role == Role.MAYOR -> MayorPane(vm, actor)
             actor.role == Role.VIGILANTE -> PickList(
-                s.roleTitle(Role.VIGILANTE), actor.name, s.whoShoot, vm.nightTargets(actor), pal().accent,
+                s.roleTitle(Role.VIGILANTE), actor.name, s.whoShoot, vm.nightTargets(actor),
                 role = Role.VIGILANTE,
                 skipLabel = s.keepShot,
                 onSkip = vm::submitSkipNight,
             ) { vm.submitNightTarget(it) }
             actor.role == Role.POISONER -> PickList(
-                s.roleTitle(Role.POISONER), actor.name, s.whoPoison, vm.nightTargets(actor), pal().accent,
+                s.roleTitle(Role.POISONER), actor.name, s.whoPoison, vm.nightTargets(actor),
                 role = Role.POISONER,
                 skipLabel = s.skipTonight,
                 onSkip = vm::submitSkipNight,
             ) { vm.submitNightTarget(it) }
             actor.role == Role.KILLER && GameRules.killerActsTonight(state.nightNumber) ->
                 PickList(
-                    s.roleTitle(Role.KILLER), actor.name, s.whoDies, vm.nightTargets(actor), pal().accent,
+                    s.roleTitle(Role.KILLER), actor.name, s.whoDies, vm.nightTargets(actor),
                     role = Role.KILLER,
                 ) { vm.submitNightTarget(it) }
             else -> DummyPane(vm, state, actor)
@@ -374,8 +374,9 @@ private fun PickList(
     onSkip: (() -> Unit)? = null,
     onPick: (String) -> Unit,
 ) {
+    val ink = if (titleColor != Color.Unspecified) titleColor else roleInk(role)
     PixelScreen(scroll = true) {
-        PixelText(title, size = 28, bold = true, color = titleColor)
+        PixelText(title, size = 28, bold = true, color = ink)
         PixelText(name.uppercase(), size = 16)
         if (role != null) {
             VSpace(10.dp)
@@ -405,7 +406,7 @@ private fun MafiaAction(vm: GameViewModel, state: GameState, actor: Player) {
     val preview = if (showCounts && vm.isLastMafia(actor.id)) vm.currentVictimPreview() else null
     val counts = if (showCounts) GameRules.mafiaVoteCounts(state.players, state.mafiaVotes) else emptyList()
     PixelScreen(scroll = true) {
-        PixelText(s.roleTitle(actor.role), size = 28, bold = true, color = c.accent)
+        PixelText(s.roleTitle(actor.role), size = 28, bold = true, color = roleInk(actor.role))
         PixelText(actor.name.uppercase(), size = 16)
         actor.role?.let {
             VSpace(10.dp)
@@ -445,7 +446,7 @@ private fun LawyerShield(vm: GameViewModel, actor: Player) {
     val s = str()
     val mates = vm.livingMafiaBesides(actor.id) + actor
     PixelScreen(scroll = true) {
-        PixelText(s.roleTitle(Role.LAWYER), size = 28, bold = true)
+        PixelText(s.roleTitle(Role.LAWYER), size = 28, bold = true, color = roleInk(Role.LAWYER))
         VSpace(10.dp)
         RoleHelpButton(Role.LAWYER)
         VSpace()
@@ -464,7 +465,7 @@ private fun LawyerShield(vm: GameViewModel, actor: Player) {
 private fun FramePane(vm: GameViewModel, state: GameState, actor: Player) {
     val s = str()
     PixelScreen(scroll = true) {
-        PixelText(s.roleTitle(Role.FRAMER), size = 28, bold = true)
+        PixelText(s.roleTitle(Role.FRAMER), size = 28, bold = true, color = roleInk(Role.FRAMER))
         PixelText(actor.name.uppercase(), size = 16)
         VSpace(10.dp)
         RoleHelpButton(Role.FRAMER)
@@ -484,10 +485,8 @@ private fun FramePane(vm: GameViewModel, state: GameState, actor: Player) {
 private fun MayorPane(vm: GameViewModel, actor: Player) {
     val s = str()
     PixelScreen(scroll = true) {
-        PixelText(s.roleTitle(Role.MAYOR), size = 28, bold = true)
+        PixelText(s.roleTitle(Role.MAYOR), size = 28, bold = true, color = roleInk(Role.MAYOR))
         PixelText(actor.name.uppercase(), size = 16)
-        VSpace(10.dp)
-        RolePortrait(Role.MAYOR, size = 96.dp)
         VSpace(10.dp)
         RoleHelpButton(Role.MAYOR)
         VSpace()
@@ -537,12 +536,10 @@ private fun ProtectAction(
 private fun WhoreAlignPane(vm: GameViewModel, actor: Player) {
     val s = str()
     PixelScreen(scroll = true) {
-        PixelText(s.roleTitle(Role.WHORE), size = 28, bold = true)
+        PixelText(s.roleTitle(Role.WHORE), size = 28, bold = true, color = roleInk(Role.WHORE))
         PixelText(actor.name.uppercase(), size = 16)
         VSpace(10.dp)
-        RolePortrait(Role.WHORE, size = 96.dp)
-        VSpace(10.dp)
-        RoleHelpButton(Role.WHORE)
+        RoleHelpButton(Role.WHORE, female = actor.femaleArt)
         VSpace()
         PixelText(s.pickSide, size = 16)
         VSpace(12.dp)
@@ -560,7 +557,7 @@ private fun WhoreAlignPane(vm: GameViewModel, actor: Player) {
 private fun WhoreSleepPane(vm: GameViewModel, state: GameState, actor: Player) {
     val s = str()
     PixelScreen(scroll = true) {
-        PixelText(s.roleTitle(Role.WHORE), size = 28, bold = true)
+        PixelText(s.roleTitle(Role.WHORE), size = 28, bold = true, color = roleInk(Role.WHORE))
         PixelText(actor.name.uppercase(), size = 16)
         VSpace(10.dp)
         RoleHelpButton(Role.WHORE)
@@ -590,12 +587,10 @@ private fun DummyPane(vm: GameViewModel, state: GameState, actor: Player) {
     if (dummy == DummyActionType.MATH) {
         val puzzle = remember { GameRules.mathPuzzle() }
         PixelScreen {
-            PixelText(title, size = 28, bold = true)
+            PixelText(title, size = 28, bold = true, color = roleInk(shown))
             shown?.let {
                 VSpace(10.dp)
-                RolePortrait(it, size = 96.dp, female = actor.femaleArt)
-                VSpace(10.dp)
-                RoleHelpButton(it)
+                RoleHelpButton(it, female = actor.femaleArt)
             }
             if (actor.role == Role.DRUNK && state.nightNumber < 3) {
                 VSpace(8.dp)
@@ -617,12 +612,10 @@ private fun DummyPane(vm: GameViewModel, state: GameState, actor: Player) {
         }
     } else {
         PixelScreen(scroll = true) {
-            PixelText(title, size = 28, bold = true)
+            PixelText(title, size = 28, bold = true, color = roleInk(shown))
             shown?.let {
                 VSpace(10.dp)
-                RolePortrait(it, size = 96.dp, female = actor.femaleArt)
-                VSpace(10.dp)
-                RoleHelpButton(it)
+                RoleHelpButton(it, female = actor.femaleArt)
             }
             if (actor.role == Role.DRUNK && state.nightNumber < 3) {
                 VSpace(8.dp)

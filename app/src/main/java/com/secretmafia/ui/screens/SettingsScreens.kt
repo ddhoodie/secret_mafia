@@ -9,6 +9,7 @@ import com.secretmafia.ui.components.PixelButton
 import com.secretmafia.ui.components.PixelScreen
 import com.secretmafia.ui.components.PixelText
 import com.secretmafia.ui.components.SettingRow
+import com.secretmafia.ui.components.Stepper
 import com.secretmafia.ui.components.VSpace
 import com.secretmafia.ui.i18n.Str
 import com.secretmafia.ui.theme.str
@@ -67,7 +68,6 @@ fun AppearanceScreen(
 
 @Composable
 fun GameplayHub(
-    onRoles: () -> Unit,
     onNight: () -> Unit,
     onDay: () -> Unit,
     onBack: () -> Unit,
@@ -76,30 +76,10 @@ fun GameplayHub(
     PixelScreen {
         PixelText(s.gameplay, size = 28, bold = true)
         VSpace(24.dp)
-        PixelButton(s.roles, onClick = onRoles)
-        VSpace(12.dp)
         PixelButton(s.round, onClick = onNight)
         VSpace(12.dp)
         PixelButton(s.day, onClick = onDay)
         VSpace(28.dp)
-        PixelButton(s.back, onClick = onBack)
-    }
-}
-
-@Composable
-fun GameplayRolesScreen(
-    settings: AppSettings,
-    onChange: (AppSettings) -> Unit,
-    onBack: () -> Unit,
-) {
-    val s = str()
-    PixelScreen(scroll = true) {
-        PixelText(s.roles, size = 28, bold = true)
-        VSpace()
-        SettingRow(s.healerRepeat, onOff(s, settings.healerMayRepeatTarget), s.healerRepeatHint) {
-            onChange(settings.copy(healerMayRepeatTarget = !settings.healerMayRepeatTarget))
-        }
-        VSpace()
         PixelButton(s.back, onClick = onBack)
     }
 }
@@ -147,8 +127,15 @@ fun GameplayDayScreen(
     PixelScreen(scroll = true) {
         PixelText(s.day, size = 28, bold = true)
         VSpace()
-        SettingRow(s.discussTimer, s.minLabel(settings.discussTimerMinutes), s.discussTimerHint) {
-            onChange(settings.copy(discussTimerMinutes = nextDiscuss(settings.discussTimerMinutes)))
+        Stepper(
+            label = s.discussTimer,
+            value = settings.discussTimerMinutes,
+            min = 0,
+            max = 30,
+            valueText = s.minLabel(settings.discussTimerMinutes),
+            hint = s.discussTimerHint,
+        ) {
+            onChange(settings.copy(discussTimerMinutes = it))
         }
         SettingRow(
             s.dayVote,
@@ -182,14 +169,6 @@ private fun dummyLabel(s: Str, type: DummyActionType) = when (type) {
     DummyActionType.LIKE -> s.like
     DummyActionType.MATH -> s.math
     DummyActionType.RANDOM -> s.random
-}
-
-private fun nextDiscuss(current: Int): Int = when (current) {
-    0 -> 2
-    2 -> 3
-    3 -> 5
-    5 -> 8
-    else -> 0
 }
 
 private fun nextDummy(current: DummyActionType): DummyActionType = when (current) {

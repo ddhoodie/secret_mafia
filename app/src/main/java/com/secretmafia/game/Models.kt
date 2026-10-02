@@ -227,7 +227,7 @@ data class Profile(
 data class AppSettings(
     val showMafiaVoteCount: Boolean = true,
     val discussTimerMinutes: Int = 0,
-    val dummyActionType: DummyActionType = DummyActionType.LIKE,
+    val dummyActionType: DummyActionType = DummyActionType.RANDOM,
     val revealRoleOnDeath: Boolean = false,
     val revealRolesAtEnd: Boolean = true,
     val firstNightKill: Boolean = true,
