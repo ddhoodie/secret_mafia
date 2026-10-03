@@ -97,6 +97,9 @@ fun GameplayNightScreen(
         SettingRow(s.firstKill, onOff(s, settings.firstNightKill), s.firstKillHint) {
             onChange(settings.copy(firstNightKill = !settings.firstNightKill))
         }
+        SettingRow(s.sameNightLook, onOff(s, settings.inspectSameNight), s.sameNightLookHint) {
+            onChange(settings.copy(inspectSameNight = !settings.inspectSameNight))
+        }
         SettingRow(s.mafiaConfer, onOff(s, settings.mafiaConfer), s.mafiaConferHint) {
             onChange(settings.copy(mafiaConfer = !settings.mafiaConfer))
         }

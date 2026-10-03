@@ -79,6 +79,10 @@ fun RoleUnlockDetail(
     onCycleWhoreAlign: () -> Unit = {},
     mayRepeatTarget: Boolean = false,
     onToggleRepeatTarget: () -> Unit = {},
+    framerFoolsSeer: Boolean = false,
+    onToggleFramerSeer: () -> Unit = {},
+    seerSeesTraitor: Boolean = false,
+    onToggleSeerTraitor: () -> Unit = {},
     onUnlock: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -118,9 +122,29 @@ fun RoleUnlockDetail(
             VSpace(8.dp)
             PixelText(s.healerRepeatHint, size = 13, color = pal().muted, align = TextAlign.Start)
         }
+        if (role == Role.FRAMER) {
+            VSpace(20.dp)
+            PixelText(s.framerFoolsSeer, size = 14, bold = true)
+            VSpace(10.dp)
+            PixelButton(if (framerFoolsSeer) s.on else s.off, onClick = onToggleFramerSeer)
+            VSpace(8.dp)
+            PixelText(s.framerFoolsSeerHint, size = 13, color = pal().muted, align = TextAlign.Start)
+        }
+        if (role == Role.TRAITOR) {
+            VSpace(20.dp)
+            PixelText(s.seerSeesTraitor, size = 14, bold = true)
+            VSpace(10.dp)
+            PixelButton(if (seerSeesTraitor) s.on else s.off, onClick = onToggleSeerTraitor)
+            VSpace(8.dp)
+            PixelText(s.seerSeesTraitorHint, size = 13, color = pal().muted, align = TextAlign.Start)
+        }
         VSpace(28.dp)
         if (!role.isFree && !owned) {
             val can = Progress.canUnlock(wallet, role)
+            PixelText(s.balance, size = 13, color = pal().muted)
+            VSpace(6.dp)
+            CoinLine(wallet)
+            VSpace(12.dp)
             PixelButton(
                 label = if (can) {
                     s.unlockFor(Progress.UNLOCK_COST, s.coinName(kind, Progress.UNLOCK_COST))
@@ -131,8 +155,6 @@ fun RoleUnlockDetail(
                 tint = coinTint(kind),
                 onClick = onUnlock,
             )
-            VSpace(8.dp)
-            CoinLine(wallet)
             VSpace(12.dp)
         }
         PixelButton(s.back, onClick = onBack)

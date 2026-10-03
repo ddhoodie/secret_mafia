@@ -22,13 +22,15 @@ class GameViewModel : ViewModel() {
                 p
             }
         }
-        val first = GameRules.livingInOrder(players, 0).first()
+        val order = nightOrderIds(players, 0, settings)
+        val firstId = order.first()
         _state.value = GameState(
             settings = settings,
             players = players,
             nightNumber = 1,
             startIndex = 0,
-            phase = nightOpenPhase(settings.mafiaConfer, first.id),
+            nightOrder = order,
+            phase = nightOpenPhase(settings.mafiaConfer, firstId),
             dummyOverride = GameRules.dummyFor(settings),
             startedAtMillis = System.currentTimeMillis(),
         )
@@ -101,17 +103,23 @@ class GameViewModel : ViewModel() {
                     reveal(
                         s, actor, s,
                         ActionAnimation.INSPECT,
-                        inspectGood = !GameRules.copSeesEvil(target, s.framedId),
+                        inspectGood = !GameRules.copSeesEvil(target, lookFrame(s)),
                         inspectName = target.name,
                     )
                 }
                 Role.SEER -> {
                     val target = s.players.first { it.id == targetId }
+                    val seen = GameRules.roleSeerSees(
+                        target,
+                        lookFrame(s),
+                        s.settings.framerFoolsSeer,
+                        s.settings.seerSeesTraitor,
+                    )
                     reveal(
                         s, actor, s,
                         ActionAnimation.SEER,
                         inspectName = target.name,
-                        inspectRole = target.role?.name,
+                        inspectRole = seen?.name,
                     )
                 }
                 Role.NECROMANCER -> {
@@ -266,7 +274,7 @@ class GameViewModel : ViewModel() {
         val s = _state.value ?: return
         val phase = s.phase as? GamePhase.RevealWait ?: return
         if (phase.kind == PassKind.HUNTER) return
-        val queue = GameRules.livingInOrder(s.players, s.startIndex)
+        val queue = passQueue(s, phase.kind)
         val idx = queue.indexOfFirst { it.id == phase.playerId }
         val next = queue.getOrNull(idx + 1)
         if (next != null) {
@@ -305,6 +313,13 @@ class GameViewModel : ViewModel() {
             poisonDueId = s.poisonDueId,
         )
         val (players, deaths) = GameRules.applyNightDeaths(s.players, hits, blocked.bodyguardTargetId)
+        val whoreRole = s.players.firstOrNull { it.id == s.whoreTargetId }?.role
+        val armed = GameRules.armLook(
+            s.settings.inspectSameNight,
+            blocked.framedId,
+            s.whoreTargetId,
+            whoreRole,
+        )
         val hunter = GameRules.firstDeadHunter(s.players, players)
         val cleared = s.copy(
             players = players,
@@ -316,7 +331,9 @@ class GameViewModel : ViewModel() {
             bodyguardTargetId = null,
             killerTargetId = null,
             whoreTargetId = null,
-            framedId = blocked.framedId,
+            framedId = null,
+            activeFrameId = armed.first,
+            sleepingId = armed.second,
             vigilanteTargetId = null,
             poisonTargetId = blocked.poisonTargetId,
             mafiaVotes = emptyMap(),
@@ -435,11 +452,13 @@ class GameViewModel : ViewModel() {
     fun continueFromDaySummary() {
         val s = _state.value ?: return
         val start = GameRules.nextStartIndex(s.players, s.startIndex)
-        val first = GameRules.livingInOrder(s.players, start).first()
+        val order = nightOrderIds(s.players, start, s.settings)
+        val first = order.first()
         _state.update {
             it?.copy(
                 nightNumber = s.nightNumber + 1,
                 startIndex = start,
+                nightOrder = order,
                 mafiaVotes = emptyMap(),
                 healTargetId = null,
                 bodyguardTargetId = null,
@@ -451,7 +470,7 @@ class GameViewModel : ViewModel() {
                 dayVotes = emptyMap(),
                 lastAction = null,
                 dummyOverride = GameRules.dummyFor(s.settings),
-                phase = nightOpenPhase(s.settings.mafiaConfer, first.id),
+                phase = nightOpenPhase(s.settings.mafiaConfer, first),
             )
         }
     }
@@ -459,12 +478,34 @@ class GameViewModel : ViewModel() {
     fun finishMafiaConfer() {
         val s = _state.value ?: return
         if (s.phase !is GamePhase.MafiaConfer) return
-        val first = GameRules.livingInOrder(s.players, s.startIndex).firstOrNull() ?: return
-        _state.update { it?.copy(phase = GamePhase.Handoff(first.id, PassKind.NIGHT)) }
+        val first = s.nightOrder.firstOrNull()
+            ?: GameRules.livingInOrder(s.players, s.startIndex).firstOrNull()?.id
+            ?: return
+        _state.update { it?.copy(phase = GamePhase.Handoff(first, PassKind.NIGHT)) }
     }
 
     private fun nightOpenPhase(confer: Boolean, firstId: String): GamePhase =
         if (confer) GamePhase.MafiaConfer else GamePhase.Handoff(firstId, PassKind.NIGHT)
+
+    private fun nightOrderIds(players: List<Player>, start: Int, settings: AppSettings): List<String> =
+        GameRules.nightPass(players, start, settings.inspectSameNight).map { it.id }
+
+    private fun passQueue(s: GameState, kind: PassKind): List<Player> {
+        if (kind == PassKind.NIGHT && s.nightOrder.isNotEmpty()) {
+            return s.nightOrder.mapNotNull { id -> s.players.firstOrNull { it.id == id && it.alive } }
+        }
+        return GameRules.livingInOrder(s.players, s.startIndex)
+    }
+
+    private fun lookFrame(s: GameState): String? {
+        val whoreRole = s.players.firstOrNull { it.id == s.whoreTargetId }?.role
+        return GameRules.frameForInspect(
+            s.settings.inspectSameNight,
+            s.framedId,
+            s.activeFrameId,
+            whoreRole,
+        )
+    }
 
     fun livingMafiaBesides(playerId: String): List<Player> {
         val s = _state.value ?: return emptyList()
@@ -520,9 +561,20 @@ class GameViewModel : ViewModel() {
         return s.players.firstOrNull { it.id != playerId && it.twinId == pair }
     }
 
+    fun lookBlocked(actor: Player): Boolean {
+        val s = _state.value ?: return false
+        if (actor.role != Role.COP && actor.role != Role.SEER) return false
+        return if (s.settings.inspectSameNight) s.whoreTargetId == actor.id else s.sleepingId == actor.id
+    }
+
     fun usesDummy(actor: Player): Boolean {
         val s = _state.value ?: return true
-        if (s.whoreTargetId == actor.id) return true
+        val vision = actor.role == Role.COP || actor.role == Role.SEER
+        if (vision && !s.settings.inspectSameNight) {
+            if (s.sleepingId == actor.id) return true
+        } else if (s.whoreTargetId == actor.id) {
+            return true
+        }
         return when (actor.role) {
             Role.WHORE -> nightTargets(actor).isEmpty()
             Role.MAFIA, Role.DON, Role.LAWYER, Role.FRAMER,

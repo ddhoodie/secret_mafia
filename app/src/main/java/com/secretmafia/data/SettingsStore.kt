@@ -33,6 +33,9 @@ class SettingsStore(private val context: Context) {
     private val revealRole = booleanPreferencesKey("reveal_role_on_death")
     private val firstKill = booleanPreferencesKey("first_night_kill")
     private val healerRepeat = booleanPreferencesKey("healer_may_repeat")
+    private val framerFoolsSeer = booleanPreferencesKey("framer_fools_seer")
+    private val seerSeesTraitor = booleanPreferencesKey("seer_sees_traitor")
+    private val inspectSameNight = booleanPreferencesKey("inspect_same_night")
     private val dayVote = stringPreferencesKey("day_vote_mode")
     private val sound = booleanPreferencesKey("sound_enabled")
     private val vibration = booleanPreferencesKey("vibration_enabled")
@@ -114,6 +117,9 @@ class SettingsStore(private val context: Context) {
             p[revealRole] = next.revealRoleOnDeath
             p[firstKill] = next.firstNightKill
             p[healerRepeat] = next.healerMayRepeatTarget
+            p[framerFoolsSeer] = next.framerFoolsSeer
+            p[seerSeesTraitor] = next.seerSeesTraitor
+            p[inspectSameNight] = next.inspectSameNight
             p[dayVote] = next.dayVoteMode.name
             p[sound] = next.soundEnabled
             p[vibration] = next.vibrationEnabled
@@ -219,6 +225,9 @@ class SettingsStore(private val context: Context) {
             revealRoleOnDeath = p[revealRole] ?: false,
             firstNightKill = p[firstKill] ?: true,
             healerMayRepeatTarget = p[healerRepeat] ?: false,
+            framerFoolsSeer = p[framerFoolsSeer] ?: false,
+            seerSeesTraitor = p[seerSeesTraitor] ?: false,
+            inspectSameNight = p[inspectSameNight] ?: false,
             dayVoteMode = runCatching {
                 DayVoteMode.valueOf(p[dayVote] ?: DayVoteMode.LIVE.name)
             }.getOrDefault(DayVoteMode.LIVE),

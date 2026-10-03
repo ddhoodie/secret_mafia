@@ -228,6 +228,57 @@ class Str(private val lang: AppLang) {
     val animDebug = t("ANIM DEBUG", "ANIM DEBUG", "DEBUG ANIM", "DEBUG ANIM", "ANIM-DEBUG", "DEBUG ANIM", "动画调试")
     val twoSteps = t("2 STEPS", "2 KORAKA", "2 PASSI", "2 PASOS", "2 SCHRITTE", "2 ÉTAPES", "两步")
     val healerRepeat = t("REPEAT HEAL / GUARD", "ISTI CILJ ZAREDOM", "RIPETI CURA / GUARDIA", "REPETIR CURA / GUARDIA", "HEIL / WACHE WIEDERHOLEN", "RÉPÉTER SOIN / GARDE", "重复治疗/守护")
+    val goodTeam = t("GOOD TEAM", "DOBRI", "BUONI", "BIEN", "GUTE", "BONS", "好人")
+    val badTeam = t("BAD TEAM", "ZLI", "CATTIVI", "MAL", "BÖSE", "MÉCHANTS", "坏人")
+    val neutralTeam = t("NEUTRAL", "NEUTRALNI", "NEUTRALI", "NEUTRAL", "NEUTRAL", "NEUTRE", "中立")
+    val balance = t("BALANCE", "STANJE", "SALDO", "SALDO", "STAND", "SOLDE", "余额")
+    val framerFoolsSeer = t("SEER SEES MAFIA", "VIDOVNJAK VIDI MAFIJU", "IL VEGGENTE VEDE MAFIA", "EL VIDENTE VE MAFIA", "SEHER SIEHT MAFIA", "LE VOYANT VOIT MAFIA", "先知看到黑手党")
+    val framerFoolsSeerHint = t(
+        "OFF: the seer sees the real role. ON: the framed player looks like MAFIA to the seer that night. The cop still sees BAD either way.",
+        "NE: vidovnjak vidi pravu ulogu. DA: nametnuti igrač te noći vidovnjaku izgleda kao MAFIJA. Policajac i dalje vidi LOŠ u oba slučaja.",
+        "NO: il veggente vede il ruolo vero. SÌ: il giocatore montato quella notte sembra MAFIA al veggente. Lo sbirro vede comunque CATTIVO.",
+        "NO: el vidente ve el rol real. SÍ: el jugador montado esa noche parece MAFIA al vidente. El poli sigue viendo MALO.",
+        "AUS: der Seher sieht die echte Rolle. AN: der geframte Spieler wirkt in der Nacht wie MAFIA für den Seher. Der Bulle sieht weiter BÖSE.",
+        "NON: le voyant voit le vrai rôle. OUI: le joueur piégé paraît MAFIA au voyant cette nuit. Le flic voit toujours MAUVAIS.",
+        "关：先知看到真实身份。开：被栽赃的人当晚在先知眼里是黑手党。警察两种情况下都看到坏人。",
+    )
+    val seerSeesTraitor = t("SEER SEES TRAITOR", "VIDOVNJAK VIDI IZDAJNIKA", "IL VEGGENTE VEDE IL TRADITORE", "EL VIDENTE VE AL TRAIDOR", "SEHER SIEHT VERRÄTER", "LE VOYANT VOIT LE TRAÎTRE", "先知看到叛徒")
+    val sameNightLook = t(
+        "SAME NIGHT LOOK",
+        "PROVERA ISTE NOĆI",
+        "CONTROLLO LA STESSA NOTTE",
+        "INVESTIGACIÓN LA MISMA NOCHE",
+        "PRÜFUNG DERSELBEN NACHT",
+        "INSPECTION LA MÊME NUIT",
+        "当晚调查",
+    )
+    val sameNightLookHint = t(
+        "OFF: A FRAME, AND A VISIT ON THE COP OR SEER, LAND THE NEXT NIGHT. THE PHONE FOLLOWS THE SEATS. ON: THEY CAN LAND THIS NIGHT, BUT THE PHONE ORDER IS RANDOM, SO THE POWER CAN MISS.",
+        "NE: NAMETANJE, I POSETA POLICAJCU ILI VIDOVNJAKU, VAŽE SLEDEĆE NOĆI. TELEFON IDE REDOM SEDENJA. DA: MOGU DA VAŽE OVE NOĆI, ALI TELEFON IDE NASUMIČNO, PA MOĆ MOŽE DA NE STIGNE.",
+        "NO: UNA MONTATURA, E UNA VISITA ALLO SBIRRO O AL VEGGENTE, VALGONO LA NOTTE DOPO. IL TELEFONO SEGUE I POSTI. SÌ: POSSONO VALERE QUESTA NOTTE, MA L'ORDINE È CASUALE, QUINDI IL POTERE PUÒ MANCARE.",
+        "NO: UN MONTAJE, Y UNA VISITA AL POLI O AL VIDENTE, VALEN LA NOCHE SIGUIENTE. EL TELÉFONO SIGUE LOS ASIENTOS. SÍ: PUEDEN VALER ESTA NOCHE, PERO EL ORDEN ES AL AZAR, ASÍ QUE EL PODER PUEDE FALLAR.",
+        "AUS: EIN FRAME UND EIN BESUCH BEIM BULLEN ODER SEHER GELTEN ERST DIE NÄCHSTE NACHT. DAS HANDY FOLGT DEN PLÄTZEN. AN: SIE KÖNNEN DIESE NACHT GELTEN, ABER DIE REIHENFOLGE IST ZUFÄLLIG, ALSO KANN DIE MACHT VERFEHLEN.",
+        "NON: UN PIÈGE, ET UNE VISITE AU FLIC OU AU VOYANT, VALENT LA NUIT SUIVANTE. LE TÉLÉPHONE SUIT LES PLACES. OUI: ILS PEUVENT VALOIR CETTE NUIT, MAIS L'ORDRE EST ALÉATOIRE, DONC LE POUVOIR PEUT RATER.",
+        "关：栽赃，以及拜访警察或先知，下一夜才生效。手机按座位传递。开：可以当晚生效，但传递顺序随机，技能可能赶不上。",
+    )
+    val noLookTonight = t(
+        "ASLEEP. NO LOOK TONIGHT.",
+        "SPAVAŠ. NEMA PROVERE NOĆAS.",
+        "DORMI. NIENTE CONTROLLO STANOTTE.",
+        "DUERMES. NO HAY INVESTIGACIÓN ESTA NOCHE.",
+        "DU SCHLÄFST. KEINE PRÜFUNG HEUTE NACHT.",
+        "TU DORS. PAS D'INSPECTION CETTE NUIT.",
+        "你睡着了。今晚不能调查。",
+    )
+    val seerSeesTraitorHint = t(
+        "OFF: the seer sees CIVILIAN. ON: the seer sees TRAITOR. The cop still sees GOOD.",
+        "NE: vidovnjak vidi CIVILA. DA: vidovnjak vidi IZDAJNIKA. Policajac i dalje vidi DOBAR.",
+        "NO: il veggente vede CIVILE. SÌ: il veggente vede TRADITORE. Lo sbirro vede comunque BUONO.",
+        "NO: el vidente ve CIVIL. SÍ: el vidente ve TRAIDOR. El poli sigue viendo BUENO.",
+        "AUS: der Seher sieht ZIVILIST. AN: der Seher sieht VERRÄTER. Der Bulle sieht weiter GUT.",
+        "NON: le voyant voit CIVIL. OUI: le voyant voit TRAÎTRE. Le flic voit toujours BON.",
+        "关：先知看到平民。开：先知看到叛徒。警察仍然看到好人。",
+    )
     val dayVote = t("DAY VOTE", "DNEVNO GLASANJE", "VOTO DIURNO", "VOTO DIURNO", "TAGESABSTIMMUNG", "VOTE DU JOUR", "白天投票")
     val on = t("ON", "DA", "SÌ", "SÍ", "AN", "OUI", "开")
     val off = t("OFF", "NE", "NO", "NO", "AUS", "NON", "关")
@@ -912,13 +963,13 @@ class Str(private val lang: AppLang) {
             "你属于好人阵营。每晚选一个活人保护，包括自己。如果那个人当夜本该死，会活下来。不能连续两夜保护同一人，除非设置允许。",
         )
         Role.COP -> t(
-            "You are on the good team. Each night you inspect one other living player. You see GOOD or BAD, not their exact role. You cannot inspect yourself. Traitor looks GOOD. A player framed that night looks BAD.",
-            "Na strani si dobrih. Svake noći proveravaš jednog drugog živog igrača. Vidiš DOBAR ili LOŠ, ne tačnu ulogu. Sebe ne možeš da proveriš. Izdajnik izgleda DOBRO. Igrač kog je nametač obeležio te noći izgleda LOŠE.",
-            "Sei nella squadra buona. Ogni notte controlli un altro giocatore vivo. Vedi BUONO o CATTIVO, non il ruolo esatto. Non puoi controllare te stesso. Il traditore appare BUONO. Un giocatore montato quella notte appare CATTIVO.",
-            "Estás en el equipo bueno. Cada noche investigas a otro jugador vivo. Ves BUENO o MALO, no el rol exacto. No puedes investigarte. El traidor se ve BUENO. Un jugador montado esa noche se ve MALO.",
-            "Du bist im guten Team. Jede Nacht prüfst du einen anderen lebenden Spieler. Du siehst GUT oder BÖSE, nicht die genaue Rolle. Dich selbst kannst du nicht prüfen. Der Verräter wirkt GUT. Ein in dieser Nacht geframter Spieler wirkt BÖSE.",
-            "Tu es dans l'équipe du bien. Chaque nuit tu inspectes un autre joueur vivant. Tu vois BON ou MAUVAIS, pas le rôle exact. Tu ne peux pas t'inspecter. Le traître paraît BON. Un joueur piégé cette nuit paraît MAUVAIS.",
-            "你属于好人阵营。每晚调查另一名活人。只看到好或坏，不是准确身份。不能查自己。叛徒显示为好人。当晚被栽赃的人显示为坏人。",
+            "You are on the good team. Each night you inspect one other living player. You see GOOD or BAD, not their exact role. You cannot inspect yourself. Traitor looks GOOD. By default a player framed last night looks BAD. Same-night look is a host option: the phone order is random, so a frame this night can miss.",
+            "Na strani si dobrih. Svake noći proveravaš jednog drugog živog igrača. Vidiš DOBAR ili LOŠ, ne tačnu ulogu. Sebe ne možeš da proveriš. Izdajnik izgleda DOBRO. Početno, igrač kog je nametač obeležio prošle noći izgleda LOŠE. Provera iste noći je opcija domaćina: telefon ide nasumično, pa nametanje te noći može da ne stigne.",
+            "Sei nella squadra buona. Ogni notte controlli un altro giocatore vivo. Vedi BUONO o CATTIVO, non il ruolo esatto. Non puoi controllare te stesso. Il traditore appare BUONO. Di base un giocatore montato la notte prima appare CATTIVO. Il controllo la stessa notte è un'opzione: l'ordine del telefono è casuale, quindi la montatura può mancare.",
+            "Estás en el equipo bueno. Cada noche investigas a otro jugador vivo. Ves BUENO o MALO, no el rol exacto. No puedes investigarte. El traidor se ve BUENO. Por defecto un jugador montado la noche anterior se ve MALO. La investigación la misma noche es una opción: el orden del teléfono es al azar, así que el montaje puede fallar.",
+            "Du bist im guten Team. Jede Nacht prüfst du einen anderen lebenden Spieler. Du siehst GUT oder BÖSE, nicht die genaue Rolle. Dich selbst kannst du nicht prüfen. Der Verräter wirkt GUT. Standardmäßig wirkt ein in der vorigen Nacht geframter Spieler BÖSE. Prüfung in derselben Nacht ist eine Option: die Handy-Reihenfolge ist zufällig, also kann das Frame verfehlen.",
+            "Tu es dans l'équipe du bien. Chaque nuit tu inspectes un autre joueur vivant. Tu vois BON ou MAUVAIS, pas le rôle exact. Tu ne peux pas t'inspecter. Le traître paraît BON. Par défaut un joueur piégé la nuit d'avant paraît MAUVAIS. L'inspection la même nuit est une option : l'ordre du téléphone est aléatoire, donc le piège peut rater.",
+            "你属于好人阵营。每晚调查另一名活人。只看到好或坏，不是准确身份。不能查自己。叛徒显示为好人。默认上一夜被栽赃的人显示为坏人。当晚调查是选项：手机顺序随机，所以栽赃可能赶不上。",
         )
         Role.CIVILIAN -> t(
             "You are on the good team. You have no night power. Each night you do a fake action so nobody can tell who has a real power. During the day, talk and vote to find the evil players. You win when no evil players remain.",
@@ -939,13 +990,13 @@ class Str(private val lang: AppLang) {
             "你属于好人阵营。活着时没有夜间行动。如果你夜里死亡或白天被放逐，立刻选一个活人。那个人也会死。",
         )
         Role.SEER -> t(
-            "You are on the good team. Each night you inspect one other living player. You see their exact role, not only good or bad. You cannot inspect yourself.",
-            "Na strani si dobrih. Svake noći proveravaš jednog drugog živog igrača. Vidiš tačnu ulogu, ne samo dobar ili loš. Sebe ne možeš da proveriš.",
-            "Sei nella squadra buona. Ogni notte controlli un altro giocatore vivo. Vedi il ruolo esatto, non solo buono o cattivo. Non puoi controllare te stesso.",
-            "Estás en el equipo bueno. Cada noche investigas a otro jugador vivo. Ves el rol exacto, no solo bueno o malo. No puedes investigarte.",
-            "Du bist im guten Team. Jede Nacht prüfst du einen anderen lebenden Spieler. Du siehst die genaue Rolle, nicht nur gut oder böse. Dich selbst kannst du nicht prüfen.",
-            "Tu es dans l'équipe du bien. Chaque nuit tu inspectes un autre joueur vivant. Tu vois le rôle exact, pas seulement bon ou mauvais. Tu ne peux pas t'inspecter.",
-            "你属于好人阵营。每晚调查另一名活人。看到准确身份，不只是好或坏。不能查自己。",
+            "You are on the good team. Each night you inspect one other living player. You see their exact role, not only good or bad. You cannot inspect yourself. A traitor looks like a civilian unless that switch is on. By default a frame from last night fools the cop, and fools you only if that switch is on. Same-night look is a host option, with a random phone order, so it can miss.",
+            "Na strani si dobrih. Svake noći proveravaš jednog drugog živog igrača. Vidiš tačnu ulogu, ne samo dobar ili loš. Sebe ne možeš da proveriš. Izdajnik izgleda kao civil, osim ako je taj prekidač uključen. Početno, nametanje od prošle noći vara policajca, a tebe samo ako je taj prekidač uključen. Provera iste noći je opcija domaćina, telefon ide nasumično, pa može da ne stigne.",
+            "Sei nella squadra buona. Ogni notte controlli un altro giocatore vivo. Vedi il ruolo esatto, non solo buono o cattivo. Non puoi controllare te stesso. Il traditore sembra civile, salvo se l'interruttore è acceso. Di base una montatura della notte prima inganna lo sbirro, e te solo se l'interruttore è acceso. Il controllo la stessa notte è un'opzione, con ordine casuale, quindi può mancare.",
+            "Estás en el equipo bueno. Cada noche investigas a otro jugador vivo. Ves el rol exacto, no solo bueno o malo. No puedes investigarte. El traidor parece civil, salvo si el interruptor está activado. Por defecto un montaje de la noche anterior engaña al poli, y a ti solo si ese interruptor está activado. La investigación la misma noche es una opción, con orden al azar, así que puede fallar.",
+            "Du bist im guten Team. Jede Nacht prüfst du einen anderen lebenden Spieler. Du siehst die genaue Rolle, nicht nur gut oder böse. Dich selbst kannst du nicht prüfen. Ein Verräter wirkt wie ein Zivilist, außer der Schalter ist an. Standardmäßig täuscht ein Frame der vorigen Nacht den Bullen, und dich nur wenn der Schalter an ist. Prüfung derselben Nacht ist eine Option, mit zufälliger Reihenfolge, also kann sie verfehlen.",
+            "Tu es dans l'équipe du bien. Chaque nuit tu inspectes un autre joueur vivant. Tu vois le rôle exact, pas seulement bon ou mauvais. Tu ne peux pas t'inspecter. Un traître ressemble à un civil, sauf si l'interrupteur est allumé. Par défaut un piège de la nuit d'avant trompe le flic, et toi seulement si cet interrupteur est allumé. L'inspection la même nuit est une option, ordre aléatoire, donc elle peut rater.",
+            "你属于好人阵营。每晚调查另一名活人。看到准确身份，不只是好或坏。不能查自己。叛徒看起来是平民，除非打开那个开关。默认上一夜的栽赃能骗过警察，只有打开开关才会骗过你。当晚调查是选项，手机顺序随机，所以可能赶不上。",
         )
         Role.BODYGUARD -> t(
             "You are on the good team. Each night you protect one other living player, not yourself. If the mafia tries to kill that player, you die instead and they live. You cannot protect the same player two nights in a row, unless that setting is on.",
@@ -1011,13 +1062,13 @@ class Str(private val lang: AppLang) {
             "你是黑手党。黑手党双胞胎成对出现。你看见自己的双胞胎，并和同伙一起投夜杀。你的双胞胎死，你同时死。其他对是分开的。",
         )
         Role.WHORE -> t(
-            "Each night you choose one other living player. That player cannot use their night power until morning. You cannot choose the same player two nights in a row. In Roles you set how they win: GOOD (wins with good), EVIL (wins with evil), JUST A PEST (never wins, only blocks), PLAY ALONE (wins when two or fewer players are left), or they choose at the start of the game.",
-            "Svake noći biraš jednog drugog živog igrača. Ta osoba ne može da koristi noćnu moć do jutra. Ne smeš istu osobu dve noći zaredom. U Ulogama se postavlja kako pobeđuje: DOBRA (sa dobrima), ZLA (sa zlima), SAMO SMETA (nikad ne pobeđuje, samo blokira), IGRA SAMA (pobedi kad ostanu dvoje ili manje), ili bira na početku igre.",
-            "Ogni notte scegli un altro giocatore vivo. Quella persona non può usare il potere notturno fino al mattino. Non puoi scegliere la stessa persona due notti di fila. In Ruoli imposti come vince: BUONA (con i buoni), CATTIVA (con i cattivi), SOLO DISTURBA (non vince mai, blocca soltanto), GIOCA DA SOLA (vince quando restano due o meno), oppure sceglie all'inizio.",
-            "Cada noche eliges a otro jugador vivo. Esa persona no puede usar su poder nocturno hasta el alba. No puedes elegir a la misma persona dos noches seguidas. En Roles se elige cómo gana: BUENA (con el bien), MALA (con el mal), SOLO MOLESTA (nunca gana, solo bloquea), JUEGA SOLA (gana si quedan dos o menos), o elige al empezar.",
-            "Jede Nacht wählst du einen anderen lebenden Spieler. Diese Person kann bis zum Morgen ihre Nachtmacht nicht nutzen. Dieselbe Person darfst du nicht zwei Nächte hintereinander wählen. Unter Rollen stellst du den Sieg ein: GUT (mit den Guten), BÖSE (mit den Bösen), NUR STÖRERIN (gewinnt nie, blockt nur), SPIELT ALLEIN (gewinnt, wenn zwei oder weniger übrig sind), oder Wahl am Start.",
-            "Chaque nuit tu choisis un autre joueur vivant. Cette personne ne peut pas utiliser son pouvoir de nuit jusqu'au matin. Tu ne peux pas choisir la même personne deux nuits de suite. Dans Rôles tu règles la victoire : BIEN (avec les bons), MAL (avec les méchants), JUSTE GÊNE (ne gagne jamais, bloque seulement), JOUE SEULE (gagne s'il reste deux joueurs ou moins), ou choix en début de partie.",
-            "每晚选另一名活人。直到早晨，那个人不能使用夜间技能。不能连续两夜选同一人。在身份里设置如何获胜：好人（和好人一起赢）、坏人（和坏人一起赢）、只捣乱（永不获胜，只封技能）、独自获胜（剩下两人及以下时赢），或开局自选。",
+            "Each night you choose one other living player. That player cannot use their night power until morning. You cannot choose the same player two nights in a row. In Roles you set how they win: GOOD (wins with good), EVIL (wins with evil), JUST A PEST (never wins, only blocks), PLAY ALONE (wins when two or fewer players are left), or they choose at the start of the game. Sleeping the cop or the seer blocks their look the next night. Sleeping anyone else still stops that night's action. Same-night look is a host option: the phone order is random, so a visit on the cop or seer can miss.",
+            "Svake noći biraš jednog drugog živog igrača. Ta osoba ne može da koristi noćnu moć do jutra. Ne smeš istu osobu dve noći zaredom. U Ulogama se postavlja kako pobeđuje: DOBRA (sa dobrima), ZLA (sa zlima), SAMO SMETA (nikad ne pobeđuje, samo blokira), IGRA SAMA (pobedi kad ostanu dvoje ili manje), ili bira na početku igre. Poseta policajcu ili vidovnjaku blokira proveru sledeće noći. Poseta ostalima i dalje gasi akciju te noći. Provera iste noći je opcija domaćina: telefon ide nasumično, pa poseta policajcu ili vidovnjaku može da ne stigne.",
+            "Ogni notte scegli un altro giocatore vivo. Quella persona non può usare il potere notturno fino al mattino. Non puoi scegliere la stessa persona due notti di fila. In Ruoli imposti come vince: BUONA (con i buoni), CATTIVA (con i cattivi), SOLO DISTURBA (non vince mai, blocca soltanto), GIOCA DA SOLA (vince quando restano due o meno), oppure sceglie all'inizio. Una visita allo sbirro o al veggente blocca il controllo la notte dopo. Una visita agli altri ferma comunque l'azione di quella notte. Il controllo la stessa notte è un'opzione: l'ordine è casuale, quindi la visita può mancare.",
+            "Cada noche eliges a otro jugador vivo. Esa persona no puede usar su poder nocturno hasta el alba. No puedes elegir a la misma persona dos noches seguidas. En Roles se elige cómo gana: BUENA (con el bien), MALA (con el mal), SOLO MOLESTA (nunca gana, solo bloquea), JUEGA SOLA (gana si quedan dos o menos), o elige al empezar. Una visita al poli o al vidente bloquea la investigación la noche siguiente. Una visita a los demás sigue parando la acción de esa noche. La investigación la misma noche es una opción: el orden es al azar, así que la visita puede fallar.",
+            "Jede Nacht wählst du einen anderen lebenden Spieler. Diese Person kann bis zum Morgen ihre Nachtmacht nicht nutzen. Dieselbe Person darfst du nicht zwei Nächte hintereinander wählen. Unter Rollen stellst du den Sieg ein: GUT (mit den Guten), BÖSE (mit den Bösen), NUR STÖRERIN (gewinnt nie, blockt nur), SPIELT ALLEIN (gewinnt, wenn zwei oder weniger übrig sind), oder Wahl am Start. Ein Besuch beim Bullen oder Seher blockt die Prüfung erst die nächste Nacht. Ein Besuch bei anderen stoppt weiter die Aktion dieser Nacht. Prüfung derselben Nacht ist eine Option: die Reihenfolge ist zufällig, also kann der Besuch verfehlen.",
+            "Chaque nuit tu choisis un autre joueur vivant. Cette personne ne peut pas utiliser son pouvoir de nuit jusqu'au matin. Tu ne peux pas choisir la même personne deux nuits de suite. Dans Rôles tu règles la victoire : BIEN (avec les bons), MAL (avec les méchants), JUSTE GÊNE (ne gagne jamais, bloque seulement), JOUE SEULE (gagne s'il reste deux joueurs ou moins), ou choix en début de partie. Une visite au flic ou au voyant bloque l'inspection la nuit suivante. Une visite aux autres arrête quand même l'action de cette nuit. L'inspection la même nuit est une option : l'ordre est aléatoire, donc la visite peut rater.",
+            "每晚选另一名活人。直到早晨，那个人不能使用夜间技能。不能连续两夜选同一人。在身份里设置如何获胜：好人（和好人一起赢）、坏人（和坏人一起赢）、只捣乱（永不获胜，只封技能）、独自获胜（剩下两人及以下时赢），或开局自选。拜访警察或先知会在下一夜封住调查。拜访其他人仍然挡住当夜行动。当晚调查是选项：手机顺序随机，所以这次拜访可能赶不上。",
         )
         Role.MAYOR -> t(
             "You are on the good team. Each night you may reveal yourself, or stay hidden. After you reveal, everyone knows you are the Mayor. Then your vote in a phone day vote counts as two votes. In a live vote, the table should also count your hand as two votes.",
@@ -1047,22 +1098,22 @@ class Str(private val lang: AppLang) {
             "你属于好人阵营。整局一次，夜里可以开枪打另一名活人。那个人当夜死亡，除非医生保护了他们。可以跳过，把这一枪留到以后的夜晚。开过枪后不能再开。",
         )
         Role.FRAMER -> t(
-            "You are mafia. Each night you vote on the kill with the crew. After that vote you may choose one living player. If the cop inspects that player the same night, the cop sees BAD, even if the player is good. You may skip the frame.",
-            "Ti si mafija. Svake noći glasaš za ubistvo sa ekipom. Posle tog glasa možeš da izabereš jednog živog igrača. Ako policajac te noći proveri tu osobu, vidi LOŠ, čak i ako je ta osoba dobra. Možeš da preskočiš nametanje.",
-            "Sei mafia. Ogni notte voti l'uccisione con la crew. Dopo quel voto puoi scegliere un giocatore vivo. Se lo sbirro controlla quella persona la stessa notte, vede CATTIVO, anche se è buona. Puoi saltare la montatura.",
-            "Eres mafia. Cada noche votas el asesinato con la banda. Tras ese voto puedes elegir a un jugador vivo. Si el poli lo investiga esa misma noche, ve MALO, aunque sea bueno. Puedes saltar el montaje.",
-            "Du bist Mafia. Jede Nacht stimmst du mit der Crew über den Mord ab. Danach darfst du einen lebenden Spieler wählen. Prüft der Bulle diese Person in derselben Nacht, sieht er BÖSE, auch wenn sie gut ist. Du kannst das Framen überspringen.",
-            "Tu es mafia. Chaque nuit tu votes le meurtre avec l'équipe. Après ce vote tu peux choisir un joueur vivant. Si le flic l'inspecte la même nuit, il voit MAUVAIS, même si la personne est bonne. Tu peux passer le piège.",
-            "你是黑手党。每晚和同伙一起投票杀人。之后可以选一名活人。如果警察当晚调查那个人，会看到坏人，即使那个人是好人。可以跳过栽赃。",
+            "You are mafia. Each night you vote on the kill with the crew. After that vote you may choose one living player. By default the cop sees BAD the next night, even if the player is good. Same-night look is a host option: the phone order is random, so the cop can already have looked and the frame misses. You may skip the frame. A switch on this role also makes the seer see MAFIA. It starts off.",
+            "Ti si mafija. Svake noći glasaš za ubistvo sa ekipom. Posle tog glasa možeš da izabereš jednog živog igrača. Početno, policajac vidi LOŠ sledeće noći, čak i ako je ta osoba dobra. Provera iste noći je opcija domaćina: telefon ide nasumično, pa policajac može već da je pogledao i nametanje ne stigne. Možeš da preskočiš nametanje. Prekidač na ovoj ulozi može da natera i vidovnjaka da vidi MAFIJU. Na početku je isključen.",
+            "Sei mafia. Ogni notte voti l'uccisione con la crew. Dopo quel voto puoi scegliere un giocatore vivo. Di base lo sbirro vede CATTIVO la notte dopo, anche se è buona. Il controllo la stessa notte è un'opzione: l'ordine del telefono è casuale, quindi lo sbirro può aver già guardato e la montatura manca. Puoi saltare la montatura. Un interruttore su questo ruolo fa vedere MAFIA anche al veggente. Parte spento.",
+            "Eres mafia. Cada noche votas el asesinato con la banda. Tras ese voto puedes elegir a un jugador vivo. Por defecto el poli ve MALO la noche siguiente, aunque sea bueno. La investigación la misma noche es una opción: el orden del teléfono es al azar, así que el poli puede haber mirado ya y el montaje falla. Puedes saltar el montaje. Un interruptor en este rol hace que el vidente también vea MAFIA. Empieza apagado.",
+            "Du bist Mafia. Jede Nacht stimmst du mit der Crew über den Mord ab. Danach darfst du einen lebenden Spieler wählen. Standardmäßig sieht der Bulle BÖSE erst die nächste Nacht, auch wenn sie gut ist. Prüfung derselben Nacht ist eine Option: die Reihenfolge ist zufällig, also kann der Bulle schon geschaut haben und das Frame verfehlt. Du kannst das Framen überspringen. Ein Schalter an dieser Rolle lässt auch den Seher MAFIA sehen. Er startet aus.",
+            "Tu es mafia. Chaque nuit tu votes le meurtre avec l'équipe. Après ce vote tu peux choisir un joueur vivant. Par défaut le flic voit MAUVAIS la nuit suivante, même si la personne est bonne. L'inspection la même nuit est une option : l'ordre est aléatoire, donc le flic peut déjà avoir regardé et le piège rate. Tu peux passer le piège. Un interrupteur sur ce rôle fait aussi voir MAFIA au voyant. Il commence éteint.",
+            "你是黑手党。每晚和同伙一起投票杀人。之后可以选一名活人。默认警察下一夜看到坏人，即使那个人是好人。当晚调查是选项：手机顺序随机，警察可能已经看过，栽赃赶不上。可以跳过栽赃。这个身份上的开关也能让先知看到黑手党。默认是关。",
         )
         Role.TRAITOR -> t(
-            "You are on the evil team. You do not see the mafia, and they do not see you. You have no night power. If the cop inspects you, they see GOOD. You still count as evil for winning.",
-            "Na strani si zlih. Ne vidiš mafiju, i oni ne vide tebe. Nemaš noćnu moć. Ako te policajac proveri, vidi DOBAR. I dalje se brojiš kao zao za pobedu.",
-            "Sei nella squadra malvagia. Non vedi la mafia e loro non vedono te. Non hai potere notturno. Se lo sbirro ti controlla, vede BUONO. Conti comunque come cattivo per la vittoria.",
-            "Estás en el equipo malvado. No ves a la mafia y ellos no te ven. No tienes poder nocturno. Si el poli te investiga, ve BUENO. Sigues contando como mal para ganar.",
-            "Du bist im bösen Team. Du siehst die Mafia nicht und sie sehen dich nicht. Du hast keine Nachtmacht. Prüft dich der Bulle, sieht er GUT. Für den Sieg zählst du trotzdem als böse.",
-            "Tu es dans l'équipe du mal. Tu ne vois pas la mafia et elle ne te voit pas. Tu n'as pas de pouvoir de nuit. Si le flic t'inspecte, il voit BON. Tu comptes quand même comme méchant pour la victoire.",
-            "你属于坏人阵营。看不见黑手党，他们也看不见你。没有夜间技能。警察调查你会看到好人。胜利计算时你仍算坏人。",
+            "You are on the evil team. You do not see the mafia, and they do not see you. You have no night power. If the cop inspects you, they see GOOD. By default the seer sees CIVILIAN. Turn the switch on if the seer should see TRAITOR. You still count as evil for winning.",
+            "Na strani si zlih. Ne vidiš mafiju, i oni ne vide tebe. Nemaš noćnu moć. Ako te policajac proveri, vidi DOBAR. Vidovnjak po početku vidi CIVILA. Uključi prekidač ako vidovnjak treba da vidi IZDAJNIKA. I dalje se brojiš kao zao za pobedu.",
+            "Sei nella squadra malvagia. Non vedi la mafia e loro non vedono te. Non hai potere notturno. Se lo sbirro ti controlla, vede BUONO. Il veggente all'inizio vede CIVILE. Accendi l'interruttore se deve vedere TRADITORE. Conti comunque come cattivo per la vittoria.",
+            "Estás en el equipo malvado. No ves a la mafia y ellos no te ven. No tienes poder nocturno. Si el poli te investiga, ve BUENO. El vidente al principio ve CIVIL. Activa el interruptor si debe ver TRAIDOR. Sigues contando como mal para ganar.",
+            "Du bist im bösen Team. Du siehst die Mafia nicht und sie sehen dich nicht. Du hast keine Nachtmacht. Prüft dich der Bulle, sieht er GUT. Der Seher sieht zuerst ZIVILIST. Schalte ein, wenn er VERRÄTER sehen soll. Für den Sieg zählst du trotzdem als böse.",
+            "Tu es dans l'équipe du mal. Tu ne vois pas la mafia et elle ne te voit pas. Tu n'as pas de pouvoir de nuit. Si le flic t'inspecte, il voit BON. Le voyant voit d'abord CIVIL. Allume l'interrupteur s'il doit voir TRAÎTRE. Tu comptes quand même comme méchant pour la victoire.",
+            "你属于坏人阵营。看不见黑手党，他们也看不见你。没有夜间技能。警察调查你会看到好人。先知默认看到平民。打开开关后先知会看到叛徒。胜利计算时你仍算坏人。",
         )
         Role.POISONER -> t(
             "You are on the evil team, but you are not in the mafia group. You do not see the mafia. Each night you may choose one living player to poison, or skip. That player dies the next night, unless a healer protects them on the night they would die. You win with evil.",

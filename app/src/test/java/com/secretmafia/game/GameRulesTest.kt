@@ -378,6 +378,54 @@ class GameRulesTest {
     }
 
     @Test
+    fun seerReadsFrameAndTraitorFromSwitches() {
+        val traitor = Player(id = "t", name = "T", role = Role.TRAITOR)
+        val town = Player(id = "c", name = "C", role = Role.CIVILIAN)
+        assertEquals(Role.CIVILIAN, GameRules.roleSeerSees(traitor, null, false, false))
+        assertEquals(Role.TRAITOR, GameRules.roleSeerSees(traitor, null, false, true))
+        assertEquals(Role.CIVILIAN, GameRules.roleSeerSees(town, "c", false, false))
+        assertEquals(Role.MAFIA, GameRules.roleSeerSees(town, "c", true, false))
+    }
+
+    @Test
+    fun displayTeamHidesDrunkAndDisguisesLunatic() {
+        val drunk = Player(id = "d", name = "D", role = Role.DRUNK)
+        val lunatic = Player(id = "l", name = "L", role = Role.LUNATIC)
+        val traitor = Player(id = "t", name = "T", role = Role.TRAITOR)
+        assertEquals(null, GameRules.displayTeam(drunk, 1))
+        assertEquals(Team.GOOD, GameRules.displayTeam(lunatic, 1))
+        assertEquals(Team.EVIL, GameRules.displayTeam(traitor, 1))
+    }
+
+    @Test
+    fun lookFrameWaitsUntilNextNightUnlessSameNightIsOn() {
+        assertEquals("c", GameRules.frameForInspect(false, "x", "c", Role.FRAMER))
+        assertEquals("x", GameRules.frameForInspect(true, "x", "c", null))
+        assertEquals(null, GameRules.frameForInspect(true, "x", "c", Role.FRAMER))
+        assertEquals("c" to "cop", GameRules.armLook(false, "c", "cop", Role.COP))
+        assertEquals("c" to "seer", GameRules.armLook(false, "c", "seer", Role.SEER))
+        assertEquals(null to null, GameRules.armLook(false, null, "h", Role.HEALER))
+        assertEquals(null to null, GameRules.armLook(true, "c", "cop", Role.COP))
+    }
+
+    @Test
+    fun sameNightPassCanLeaveSeatOrder() {
+        val players = listOf(
+            Player(id = "a", name = "A", role = Role.COP),
+            Player(id = "b", name = "B", role = Role.FRAMER),
+            Player(id = "c", name = "C", role = Role.SEER),
+            Player(id = "d", name = "D", role = Role.WHORE),
+        )
+        assertEquals(listOf("a", "b", "c", "d"), GameRules.nightPass(players, 0, false).map { it.id })
+        val seats = setOf("a", "b", "c", "d")
+        val passes = (1..20).map { seed ->
+            GameRules.nightPass(players, 0, true, kotlin.random.Random(seed)).map { it.id }
+        }
+        assertTrue(passes.all { it.toSet() == seats })
+        assertTrue(passes.any { it != listOf("a", "b", "c", "d") })
+    }
+
+    @Test
     fun mayorPhoneVoteCountsTwice() {
         val votes = mapOf("mayor" to "a", "b" to "c")
         assertEquals("a", GameRules.resolveDayPhoneVote(votes, "mayor"))

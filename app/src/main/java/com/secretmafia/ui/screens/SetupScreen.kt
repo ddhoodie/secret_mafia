@@ -31,6 +31,7 @@ import com.secretmafia.game.RoleCounts
 import com.secretmafia.game.Team
 import com.secretmafia.game.Wallet
 import com.secretmafia.ui.components.BuyRoleDialog
+import com.secretmafia.ui.components.RoleHelpDialog
 import com.secretmafia.ui.components.MiniBtn
 import com.secretmafia.ui.components.PixelButton
 import com.secretmafia.ui.components.PixelScreen
@@ -65,6 +66,7 @@ fun SetupScreen(
     val c = pal()
     var names by remember(setupRevision) { mutableStateOf(savedNames.toMutableList()) }
     var buyRole by remember { mutableStateOf<Role?>(null) }
+    var infoRole by remember { mutableStateOf<Role?>(null) }
 
     LaunchedEffect(names) {
         onNamesChange(names.toList())
@@ -85,6 +87,9 @@ fun SetupScreen(
     val balanceOk = !GameRules.tooManyEvil(counts)
     val canStart = namesOk && rolesOk && balanceOk
 
+    infoRole?.let { role ->
+        RoleHelpDialog(role) { infoRole = null }
+    }
     buyRole?.let { role ->
         BuyRoleDialog(
             role = role,
@@ -124,13 +129,13 @@ fun SetupScreen(
             PixelText(s.recommendedFor(names.size), size = 13)
         }
         VSpace(10.dp)
-        CoreStepper(Role.MAFIA, counts, onCounts)
+        CoreStepper(Role.MAFIA, counts, onCounts) { infoRole = it }
         VSpace(8.dp)
-        CoreStepper(Role.HEALER, counts, onCounts)
+        CoreStepper(Role.HEALER, counts, onCounts) { infoRole = it }
         VSpace(8.dp)
-        CoreStepper(Role.COP, counts, onCounts)
+        CoreStepper(Role.COP, counts, onCounts) { infoRole = it }
         VSpace(8.dp)
-        CoreStepper(Role.CIVILIAN, counts, onCounts)
+        CoreStepper(Role.CIVILIAN, counts, onCounts) { infoRole = it }
         VSpace(10.dp)
         SettingRow(
             s.advanced,
@@ -142,53 +147,53 @@ fun SetupScreen(
             VSpace(14.dp)
             PixelText(s.goodRoles, size = 14)
             VSpace(8.dp)
-            AdvSlot(Role.HUNTER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.HUNTER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.SEER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.SEER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.BODYGUARD, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.BODYGUARD, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.MAYOR, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.MAYOR, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.NECROMANCER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.NECROMANCER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.VIGILANTE, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.VIGILANTE, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            TwinSlot(Role.TWIN_CIVIL, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            TwinSlot(Role.TWIN_CIVIL, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
 
             VSpace(16.dp)
             PixelText(s.evilRoles, size = 14)
             VSpace(8.dp)
-            AdvSlot(Role.DON, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.DON, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.LAWYER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.LAWYER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.FRAMER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.FRAMER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.TRAITOR, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.TRAITOR, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.POISONER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.POISONER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            TwinSlot(Role.TWIN_MAFIA, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            TwinSlot(Role.TWIN_MAFIA, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
 
             VSpace(16.dp)
             PixelText(s.wildRoles, size = 14)
             VSpace(8.dp)
-            AdvSlot(Role.JOKER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.JOKER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.KILLER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.KILLER, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.LUNATIC, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.LUNATIC, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.DRUNK, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.DRUNK, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.WHORE, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.WHORE, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.CURSED, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.CURSED, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.SURVIVOR, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.SURVIVOR, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
             VSpace(8.dp)
-            AdvSlot(Role.AMNESIAC, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) })
+            AdvSlot(Role.AMNESIAC, counts, chances, wallet, onBuy = { buyRole = it }, onCount = ::setRole, onChance = { r, p -> onChances(chances.with(r, p)) }, onInfo = { infoRole = it })
         }
 
         VSpace(10.dp)
@@ -244,9 +249,16 @@ private fun RoleSplitHint(counts: RoleCounts, playerCount: Int, showOptimal: Boo
 }
 
 @Composable
-private fun CoreStepper(role: Role, counts: RoleCounts, onChange: (RoleCounts) -> Unit) {
+private fun CoreStepper(
+    role: Role,
+    counts: RoleCounts,
+    onChange: (RoleCounts) -> Unit,
+    onInfo: (Role) -> Unit,
+) {
     val s = str()
-    Stepper(s.roleTitle(role), counts[role]) { onChange(counts.with(role, it)) }
+    Stepper(s.roleTitle(role), counts[role], onLabelClick = { onInfo(role) }) {
+        onChange(counts.with(role, it))
+    }
 }
 
 @Composable
@@ -258,13 +270,20 @@ private fun AdvSlot(
     onBuy: (Role) -> Unit,
     onCount: (Role, Int) -> Unit,
     onChance: (Role, Int) -> Unit,
+    onInfo: (Role) -> Unit,
 ) {
     if (!wallet.owns(role)) {
-        LockedRoleRow(role) { onBuy(role) }
+        LockedRoleRow(role, onInfo = { onInfo(role) }) { onBuy(role) }
         return
     }
     val s = str()
-    Stepper(s.roleTitle(role), counts[role], min = 0, max = GameRules.MAX_PLAYERS) {
+    Stepper(
+        s.roleTitle(role),
+        counts[role],
+        min = 0,
+        max = GameRules.MAX_PLAYERS,
+        onLabelClick = { onInfo(role) },
+    ) {
         onCount(role, it)
     }
     if (counts[role] > 0) {
@@ -282,13 +301,21 @@ private fun TwinSlot(
     onBuy: (Role) -> Unit,
     onCount: (Role, Int) -> Unit,
     onChance: (Role, Int) -> Unit,
+    onInfo: (Role) -> Unit,
 ) {
     if (!wallet.owns(role)) {
-        LockedRoleRow(role) { onBuy(role) }
+        LockedRoleRow(role, onInfo = { onInfo(role) }) { onBuy(role) }
         return
     }
     val s = str()
-    Stepper(s.roleTitle(role), counts[role], min = 0, max = GameRules.MAX_PLAYERS, step = 2) { next ->
+    Stepper(
+        s.roleTitle(role),
+        counts[role],
+        min = 0,
+        max = GameRules.MAX_PLAYERS,
+        step = 2,
+        onLabelClick = { onInfo(role) },
+    ) { next ->
         onCount(role, next)
     }
     if (counts[role] > 0) {
@@ -334,14 +361,13 @@ private fun ChanceRow(role: Role, percent: Int, onChance: (Role, Int) -> Unit) {
 }
 
 @Composable
-private fun LockedRoleRow(role: Role, onBuy: () -> Unit) {
+private fun LockedRoleRow(role: Role, onInfo: () -> Unit, onBuy: () -> Unit) {
     val s = str()
     val c = pal()
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .border(2.dp, c.fg)
-            .clickable(onClick = onBuy)
             .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -351,9 +377,15 @@ private fun LockedRoleRow(role: Role, onBuy: () -> Unit) {
             size = 16,
             bold = true,
             align = TextAlign.Start,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).clickable(onClick = onInfo),
         )
-        PixelText(s.buyFirst, size = 16, bold = true, color = c.accent)
+        PixelText(
+            s.buyFirst,
+            size = 16,
+            bold = true,
+            color = c.accent,
+            modifier = Modifier.clickable(onClick = onBuy),
+        )
     }
 }
 

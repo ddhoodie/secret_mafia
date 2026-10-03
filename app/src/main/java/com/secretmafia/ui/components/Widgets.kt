@@ -288,6 +288,7 @@ fun Stepper(
     step: Int = 1,
     valueText: String? = null,
     hint: String? = null,
+    onLabelClick: (() -> Unit)? = null,
     onChange: (Int) -> Unit,
 ) {
     val c = pal()
@@ -299,7 +300,10 @@ fun Stepper(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        PixelText(label, size = 16, bold = true, align = TextAlign.Start, modifier = Modifier.weight(1f))
+        val labelMod = Modifier.weight(1f).let { base ->
+            if (onLabelClick == null) base else base.clickable(onClick = onLabelClick)
+        }
+        PixelText(label, size = 16, bold = true, align = TextAlign.Start, modifier = labelMod)
         MiniBtn("-") { if (value > min) onChange((value - step).coerceAtLeast(min)) }
         Box(Modifier.widthIn(min = 48.dp), contentAlignment = Alignment.Center) {
             PixelText(valueText ?: value.toString(), size = 16, bold = true)

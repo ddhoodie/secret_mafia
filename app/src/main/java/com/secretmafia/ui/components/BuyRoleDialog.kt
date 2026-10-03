@@ -12,6 +12,7 @@ import com.secretmafia.game.Progress
 import com.secretmafia.game.Role
 import com.secretmafia.game.Team
 import com.secretmafia.game.Wallet
+import com.secretmafia.ui.theme.pal
 import com.secretmafia.ui.theme.str
 
 @Composable
@@ -43,8 +44,10 @@ fun BuyRoleDialog(
                     size = 14,
                 )
                 VSpace(14.dp)
-                PixelText(s.roleBlurb(role), size = 16, align = TextAlign.Start)
+                PixelText(s.roleMoreInfo(role), size = 16, align = TextAlign.Start)
                 VSpace(18.dp)
+                PixelText(s.balance, size = 13, color = pal().muted)
+                VSpace(6.dp)
                 CoinLine(wallet)
                 VSpace(12.dp)
                 PixelButton(

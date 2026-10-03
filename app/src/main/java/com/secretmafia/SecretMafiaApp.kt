@@ -245,6 +245,14 @@ fun SecretMafiaApp(
                             onToggleRepeatTarget = {
                                 save(settings.copy(healerMayRepeatTarget = !settings.healerMayRepeatTarget))
                             },
+                            framerFoolsSeer = settings.framerFoolsSeer,
+                            onToggleFramerSeer = {
+                                save(settings.copy(framerFoolsSeer = !settings.framerFoolsSeer))
+                            },
+                            seerSeesTraitor = settings.seerSeesTraitor,
+                            onToggleSeerTraitor = {
+                                save(settings.copy(seerSeesTraitor = !settings.seerSeesTraitor))
+                            },
                             onUnlock = { scope.launch { store.unlockRole(role) } },
                             onBack = { nav.popBackStack() },
                         )

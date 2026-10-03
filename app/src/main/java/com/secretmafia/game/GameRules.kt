@@ -346,6 +346,55 @@ object GameRules {
         }
     }
 
+    fun displayTeam(player: Player, nightNumber: Int): Team? {
+        if (shownRole(player, nightNumber) == null) return null
+        if (player.role == Role.LUNATIC) return Team.GOOD
+        return player.side
+    }
+
+    fun roleSeerSees(
+        target: Player,
+        framedId: String?,
+        framerFoolsSeer: Boolean,
+        seerSeesTraitor: Boolean,
+    ): Role? {
+        if (framerFoolsSeer && framedId != null && target.id == framedId) return Role.MAFIA
+        if (target.role == Role.TRAITOR && !seerSeesTraitor) return Role.CIVILIAN
+        return target.role
+    }
+
+    fun frameForInspect(
+        sameNight: Boolean,
+        framedTonight: String?,
+        activeFrameId: String?,
+        whoreTargetRole: Role?,
+    ): String? {
+        if (!sameNight) return activeFrameId
+        if (whoreTargetRole == Role.FRAMER) return null
+        return framedTonight
+    }
+
+    fun armLook(
+        sameNight: Boolean,
+        framedAfterBlock: String?,
+        whoreTargetId: String?,
+        whoreTargetRole: Role?,
+    ): Pair<String?, String?> {
+        if (sameNight) return null to null
+        val sleep = if (whoreTargetRole == Role.COP || whoreTargetRole == Role.SEER) whoreTargetId else null
+        return framedAfterBlock to sleep
+    }
+
+    fun nightPass(
+        players: List<Player>,
+        startIndex: Int,
+        randomOrder: Boolean,
+        random: kotlin.random.Random = kotlin.random.Random.Default,
+    ): List<Player> {
+        val living = livingInOrder(players, startIndex)
+        return if (randomOrder) living.shuffled(random) else living
+    }
+
     fun copSeesEvil(target: Player, framedId: String? = null): Boolean {
         if (target.id == framedId) return true
         if (target.role == Role.TRAITOR) return false
